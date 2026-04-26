@@ -1,0 +1,5 @@
+# Daily Haravan incremental sync at 02:00 (Asia/Ho_Chi_Minh)
+# Install: crontab -e, then paste this line; verify with `crontab -l`.
+# Logs go to /var/log/haravan-elt.log (rotate via logrotate).
+
+0 2 * * * /opt/haravan-elt/scripts/run-daily.sh >> /var/log/haravan-elt.log 2>&1
