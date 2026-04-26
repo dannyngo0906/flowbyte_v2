@@ -1,0 +1,34 @@
+interactions:
+- request:
+    body: '{"chat_id": "999", "text": "hello", "parse_mode": "Markdown", "disable_web_page_preview": true}'
+    headers:
+      content-type:
+      - application/json
+    method: POST
+    uri: https://api.telegram.org/botTEST_TOKEN/sendMessage
+  response:
+    body:
+      string: '{"ok": false, "error_code": 500, "description": "Internal Server Error"}'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 500
+      message: Internal Server Error
+- request:
+    body: '{"chat_id": "999", "text": "hello", "parse_mode": "Markdown", "disable_web_page_preview": true}'
+    headers:
+      content-type:
+      - application/json
+    method: POST
+    uri: https://api.telegram.org/botTEST_TOKEN/sendMessage
+  response:
+    body:
+      string: '{"ok": false, "error_code": 500, "description": "Internal Server Error"}'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 500
+      message: Internal Server Error
+version: 1

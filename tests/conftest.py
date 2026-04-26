@@ -24,9 +24,11 @@ def _isolate_env(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     yield
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def vcr_config() -> dict[str, object]:
-    """pytest-vcr config consumed by `@pytest.mark.vcr` tests in later phases."""
+    """pytest-vcr config — must be module-scoped to satisfy pytest-vcr's own
+    fixture scoping. Body matching is intentionally OFF so we can replay one
+    cassette for multiple texts when only the URL/method matters."""
     return {
         "filter_headers": [("authorization", "Bearer DUMMY")],
         "match_on": ["method", "scheme", "host", "port", "path", "query"],

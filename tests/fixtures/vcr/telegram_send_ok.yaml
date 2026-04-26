@@ -1,0 +1,18 @@
+interactions:
+- request:
+    body: '{"chat_id": "999", "text": "hello", "parse_mode": "Markdown", "disable_web_page_preview": true}'
+    headers:
+      content-type:
+      - application/json
+    method: POST
+    uri: https://api.telegram.org/botTEST_TOKEN/sendMessage
+  response:
+    body:
+      string: '{"ok": true, "result": {"message_id": 1, "date": 1714000000, "text": "hello"}}'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+version: 1

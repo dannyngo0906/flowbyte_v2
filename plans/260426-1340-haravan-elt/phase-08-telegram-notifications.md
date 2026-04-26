@@ -8,7 +8,7 @@
 ## Overview
 
 - **Priority:** high
-- **Status:** pending
+- **Status:** completed (live-channel verification deferred)
 - **Effort:** 2 days
 - **Description:** Full Telegram notification system: 4 event types (start/success/fail/warning), Markdown templates per PRD §4.6 FR-N3, fail-soft (never crash pipeline). Hook into Pipeline lifecycle. CLI flag `--no-notify` disables.
 
@@ -205,15 +205,15 @@ HaravanClient.rate_limit_counter (new attribute):
 
 ## Todo List
 
-- [ ] Finalize `client/telegram.py` (`send` fail-soft, escape helpers, MarkdownV2 option)
-- [ ] Create `notifications.py` with `Notifier` class (4 event methods)
-- [ ] Add `consecutive_429` counter to `HaravanClient`
-- [ ] Wire `Notifier` into `Pipeline.run_all` (start cron-only, success, failure, warning)
-- [ ] Implement `parse_run_results` helper in `dbt_runner.py`
-- [ ] Record VCR cassettes (telegram 200, 500)
-- [ ] Write `test_telegram.py` (4 cases) and `test_notifications.py` (4 cases)
-- [ ] Manual end-to-end: trigger pipeline with `--triggered-by cron --no-notify=false` and verify start + success messages arrive in test channel
-- [ ] Verify failure path: induce error in extract → failure message arrives
+- [x] Finalize `client/telegram.py` (`send` fail-soft, escape helpers, MarkdownV2 option)
+- [x] Create `notifications.py` with `Notifier` class (4 event methods)
+- [x] Add `consecutive_429` counter to `HaravanClient` (also tracks `max_consecutive_429` peak)
+- [x] Wire `Notifier` into `Pipeline.run_all` (start cron-only, success, failure, warning)
+- [x] Implement `parse_run_results` helper in `dbt_runner.py`
+- [x] Record VCR cassettes (telegram 200, 500) — hand-crafted; replayed via `vcr.use_cassette()` to keep plan-specified filenames
+- [x] Write tests: `test_telegram_client.py` (12 cases incl. retry/escape/VCR) and `test_notifications.py` (12 cases)
+- [ ] Manual end-to-end: trigger pipeline with `--triggered-by cron --no-notify=false` and verify start + success messages arrive in test channel — DEFERRED, needs live `TELEGRAM_BOT_TOKEN`
+- [ ] Verify failure path: induce error in extract → failure message arrives — DEFERRED, needs live channel
 
 ## Success Criteria
 

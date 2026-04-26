@@ -57,6 +57,11 @@ class HaravanClient:
             settings.haravan.rate_limit_burst,
         )
         self._refresh_lock = threading.Lock()
+        # Tracks consecutive 429s observed across requests. Pipeline reads this
+        # after a run to decide whether to emit a Telegram rate-limit warning.
+        # Resets on any non-429 response.
+        self.consecutive_429 = 0
+        self.max_consecutive_429 = 0
 
     def close(self) -> None:
         self._http.close()
@@ -99,12 +104,23 @@ class HaravanClient:
             # in addition to the explicit Retry-After sleep. Both are kept on
             # purpose: Retry-After matches Haravan's signal exactly, tenacity
             # backoff guards against malformed/missing headers.
+            self.consecutive_429 += 1
+            self.max_consecutive_429 = max(self.max_consecutive_429, self.consecutive_429)
             retry_after = self._parse_retry_after(resp)
-            logger.warning("haravan_429", retry_after=retry_after, path=path)
+            logger.warning(
+                "haravan_429",
+                retry_after=retry_after,
+                path=path,
+                consecutive=self.consecutive_429,
+            )
             time.sleep(retry_after)
             raise HaravanRateLimitError(
                 "rate limit", retry_after=retry_after, status=429, body=resp.text
             )
+
+        # Any non-429 (including non-2xx that error below) clears the streak —
+        # a run interleaved with 200s shouldn't trip the warning.
+        self.consecutive_429 = 0
 
         if resp.status_code == 401:
             # Auth error: refresh + retry ONCE, outside tenacity loop.

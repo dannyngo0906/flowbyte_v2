@@ -14,7 +14,6 @@ from typing import Any
 
 import structlog
 
-from haravan_elt.cli_helpers import format_run_failure, format_run_success
 from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.client.telegram import TelegramClient
 from haravan_elt.config import Settings
@@ -22,8 +21,13 @@ from haravan_elt.dbt_runner import run_dbt
 from haravan_elt.extractors.registry import DOMAIN_ORDER, EXTRACTORS
 from haravan_elt.loaders.postgres import PostgresLoader
 from haravan_elt.meta.state import StateManager
+from haravan_elt.notifications import Notifier
 
 logger = structlog.get_logger(__name__)
+
+# Threshold for emitting a rate-limit Telegram warning. Below this, retries
+# are considered normal noise.
+RATE_LIMIT_WARN_THRESHOLD = 3
 
 
 class Pipeline:
@@ -44,6 +48,7 @@ class Pipeline:
         self.loader = PostgresLoader(dsn)
         self.state = StateManager(dsn)
         self.telegram = telegram
+        self.notifier = Notifier(telegram)
 
     def close(self) -> None:
         self.client.close()
@@ -136,31 +141,50 @@ class Pipeline:
         dry_run: bool = False,
         no_notify: bool = False,
     ) -> int:
-        """Full pipeline: extract-all → dbt build → notify. Returns exit code."""
+        """Full pipeline: extract-all → dbt build → notify. Returns exit code.
+
+        Notifier wiring (PRD §4.6 FR-N2):
+          - start    → cron only (manual would spam)
+          - warning  → rate-limit streak or dbt test failures, BEFORE success
+          - success  → final status with extract counts + dbt summary
+          - failure  → any exception aborts and notifies with stage + traceback
+        """
+        notifier = self._effective_notifier(no_notify)
         start = time.time()
+        notifier.start(mode, self.triggered_by)
+        ext_summary: dict[str, int] = {}
+        stage = "extract"
         try:
             ext_summary = self.extract_all(mode=mode, since=since, until=until, dry_run=dry_run)
+            stage = "dbt_build"
             dbt_summary = self.dbt_build()
             duration = time.time() - start
+            self._notify_warnings(notifier, dbt_summary)
             if not dbt_summary.get("success"):
                 raise RuntimeError(f"dbt build failed: {dbt_summary.get('exception') or 'unknown'}")
-            if not no_notify:
-                self._maybe_notify(format_run_success(ext_summary, dbt_summary, duration))
+            notifier.success(ext_summary, dbt_summary, duration)
             return 0
         except Exception as exc:
-            logger.error("run_all_failed", error=str(exc))
-            if not no_notify:
-                self._maybe_notify(format_run_failure(exc))
+            logger.error("run_all_failed", stage=stage, error=str(exc))
+            notifier.failure(stage=stage, exc=exc)
             return 1
 
     # ------------------------------------------------------------------ helpers
 
-    def _maybe_notify(self, message: str) -> None:
-        """Fail-soft notification. Telegram outages or formatter bugs MUST NOT
-        change the pipeline exit code (PRD FR-N4)."""
-        if self.telegram is None or not self.telegram.enabled:
-            return
-        try:
-            self.telegram.send(message)
-        except Exception as exc:  # noqa: BLE001 — fail-soft contract
-            logger.warning("telegram_notify_swallowed", error=str(exc))
+    def _effective_notifier(self, no_notify: bool) -> Notifier:
+        """Return a no-op notifier when `--no-notify` is set, else the real
+        one bound at construction time."""
+        return Notifier(None) if no_notify else self.notifier
+
+    def _notify_warnings(self, notifier: Notifier, dbt_summary: dict[str, Any]) -> None:
+        """Emit non-fatal warnings BEFORE the final success/failure event so
+        they're visible even if the run later fails (Q2 in plan)."""
+        peak = getattr(self.client, "max_consecutive_429", 0)
+        if peak > RATE_LIMIT_WARN_THRESHOLD:
+            notifier.warning(
+                f"Rate limit hit {peak} consecutive times",
+                "Consider lowering HARAVAN_RATE_LIMIT_PER_SEC",
+            )
+        tests_failed = dbt_summary.get("tests_failed", 0)
+        if tests_failed:
+            notifier.warning(f"{tests_failed} dbt tests failed")
