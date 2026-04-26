@@ -29,8 +29,9 @@ def init() -> None:
     """Apply schema.sql against DATABASE_URL. Idempotent."""
     settings = load_settings()
     sql = _read_schema_sql()
+    dsn = settings.database.database_url.get_secret_value()
     # `with conn` already commits on clean exit; no explicit commit needed.
-    with psycopg.connect(settings.database_url.get_secret_value()) as conn, conn.cursor() as cur:
+    with psycopg.connect(dsn) as conn, conn.cursor() as cur:
         cur.execute(sql)
     console.print("[green]✓[/green] schemas + meta tables ready")
 
