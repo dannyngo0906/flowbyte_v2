@@ -24,6 +24,12 @@ class PostgresLoader:
     def __init__(self, dsn: str) -> None:
         self._dsn = dsn
 
+    @property
+    def dsn(self) -> str:
+        """Read-only access for extractors that need to read raw.* (e.g. the
+        cartesian inventory_locations extractor pulls location/variant ids)."""
+        return self._dsn
+
     def upsert_batch(
         self,
         table: str,

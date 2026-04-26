@@ -5,7 +5,7 @@ name: Haravan ELT Pipeline
 status: in-progress
 priority: P1
 effort: ~8 weeks
-progress: 8/12 phases (~67%)
+progress: 9/12 phases (~75%)
 branch: feat/haravan-elt
 date: 2026-04-26
 created: 2026-04-26
@@ -35,12 +35,12 @@ See [`docs/tech-stack.md`](../../docs/tech-stack.md) — Python 3.11, httpx, ten
 | 06 | dbt marts (core) | M3 | ✅ completed | 5bb286f + 2209b91 | 5d |
 | 07 | CLI + orchestrator | M4 | ✅ completed | ccc650a + 1fb0780 | 4d |
 | 08 | Telegram notifications | M4 | ✅ completed | (this branch) | 2d |
-| 09 | P1 domains + validate | M5 | pending | — | 5d |
+| 09 | P1 domains + validate | M5 | ✅ completed | (this branch) | 5d |
 | 10 | Hardening | M6 | pending | — | 5d |
 | 11 | Post-MVP domains | M7 | pending | — | 5d |
 | 12 | CI (GitHub Actions) | M6 (parallel) | pending | — | 1d |
 
-**Progress:** 8 / 12 phases done. Verification: 96/96 pytest pass (91% coverage incl. notifications.py 98%, telegram.py 100%), dbt build 95/95 nodes, mypy clean.
+**Progress:** 9 / 12 phases done. Verification: 113/113 pytest pass (89% coverage), dbt build 135/135 nodes (8 raw tables, 11 staging views, 12 marts), mypy clean.
 
 **Deferred items (committed but not strictly checked off in phase todo lists):**
 - VCR cassette recording (phases 02/03/04) → used `respx` mocks; real cassettes need live Haravan token (phase-10 hardening)

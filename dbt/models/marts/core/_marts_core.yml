@@ -129,7 +129,51 @@ models:
               field: order_key
 
   - name: fct_inventory_adjustments
-    description: "Placeholder until phase-09 (M5)."
+    description: "Grain: 1 row per adjustment event. Incremental on adjusted_at."
+    columns:
+      - name: adjustment_key
+        tests: [unique, not_null]
+      - name: adjustment_id
+        tests: [unique, not_null]
+      - name: variant_key
+        tests:
+          - relationships:
+              to: ref('dim_variants')
+              field: variant_key
+      - name: location_key
+        tests:
+          - relationships:
+              to: ref('dim_locations')
+              field: location_key
+      - name: adjustment_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
 
   - name: fct_inventory_snapshot
-    description: "Placeholder until phase-09 (M5)."
+    description: "Grain: 1 row per (location, variant, snapshot_date). Daily incremental merge."
+    columns:
+      - name: snapshot_key
+        tests: [unique, not_null]
+      - name: variant_key
+        tests:
+          - relationships:
+              to: ref('dim_variants')
+              field: variant_key
+      - name: location_key
+        tests:
+          - relationships:
+              to: ref('dim_locations')
+              field: location_key
+      - name: snapshot_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: on_hand_quantity
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+              config:
+                severity: warn

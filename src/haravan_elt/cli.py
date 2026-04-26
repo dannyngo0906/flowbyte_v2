@@ -16,12 +16,15 @@ import typer
 from rich.console import Console
 
 from haravan_elt.cli_helpers import render_status_table
+from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.client.telegram import TelegramClient
 from haravan_elt.config import Settings, load_settings
 from haravan_elt.extractors.registry import EXTRACTORS
 from haravan_elt.logging import setup_logging
 from haravan_elt.meta.state import StateManager
 from haravan_elt.pipeline import Pipeline
+from haravan_elt.validate import DEFAULT_TOLERANCE, DOMAIN_RAW_TABLE
+from haravan_elt.validate import validate as run_validate
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 console = Console()
@@ -192,11 +195,30 @@ def notify(message: str = typer.Argument(..., help="Free-form Markdown message."
 @app.command()
 def validate(
     domain: str = typer.Argument(..., help="Domain to validate (raw row count vs API)"),
+    tolerance: float = typer.Option(
+        DEFAULT_TOLERANCE,
+        help="Relative drift tolerance (default 0.001 = 0.1%).",
+    ),
 ) -> None:
-    """Compare raw row count vs Haravan API count.json. Implemented in phase-09 (M5)."""
-    del domain
-    typer.echo("validate: not implemented until phase-09 (M5)", err=True)
-    raise typer.Exit(2)
+    """Compare raw row count vs Haravan API `/count.json`. Exit 0 if within
+    tolerance, 1 on mismatch, 2 on bad input."""
+    if domain not in DOMAIN_RAW_TABLE:
+        typer.echo(
+            f"unknown domain: {domain}; known: {sorted(DOMAIN_RAW_TABLE)}",
+            err=True,
+        )
+        raise typer.Exit(2)
+    settings = load_settings()
+    dsn = settings.database.database_url.get_secret_value()
+    with HaravanClient(settings) as client:
+        result = run_validate(domain, client, dsn, tolerance=tolerance)
+    status = "[green]OK[/green]" if result.ok else "[red]MISMATCH[/red]"
+    console.print(
+        f"{status} {domain}: api={result.api_count} db={result.db_count} "
+        f"ratio={result.ratio:.4f} (tolerance={tolerance})"
+    )
+    if not result.ok:
+        raise typer.Exit(1)
 
 
 # ---------------------------------------------------------------------- helpers

@@ -9,7 +9,7 @@
 ## Overview
 
 - **Priority:** medium
-- **Status:** pending
+- **Status:** completed (live-API verification deferred)
 - **Effort:** 5 days
 - **Description:** Add P1 extractors (inventory adjustments + location balance + collections); flesh out `fct_inventory_adjustments` mart; add `fct_inventory_snapshot` daily snapshot fact; implement `haravan-elt validate <domain>` command (raw row count vs Haravan `/count.json`). User-locked extras IN scope.
 
@@ -300,17 +300,17 @@ Validate flow:
 
 ## Todo List
 
-- [ ] Append DDL for 4 new raw tables (incl. composite-PK `inventory_locations`)
-- [ ] Implement 4 new extractors (inventory_adjustments, inventory_locations cartesian, custom_collections, smart_collections)
-- [ ] Update `extractors/registry.py` (8 domains total + new DOMAIN_ORDER)
-- [ ] Add 4 staging models + 1 intermediate (snapshot_prepared if needed)
-- [ ] Replace placeholder `fct_inventory_adjustments` and `fct_inventory_snapshot` with full impl
-- [ ] Add new sources to `sources.yml`
-- [ ] Implement `validate.py` (count comparison) + CLI command
-- [ ] Record VCR cassettes for new endpoints + count.json
-- [ ] Write tests (4 extractors + validate); verify cartesian batching correctness
-- [ ] Manual: `haravan-elt run-all` includes P1 domains; `haravan-elt validate orders` returns OK
-- [ ] Verify `fct_inventory_snapshot` incremental: re-run same day → row count unchanged; next day → new row per (loc,variant)
+- [x] Append DDL for 4 new raw tables (incl. composite-PK `inventory_locations`)
+- [x] Implement 4 new extractors (inventory_adjustments, inventory_locations cartesian, custom_collections, smart_collections)
+- [x] Update `extractors/registry.py` (8 domains total + new DOMAIN_ORDER)
+- [x] Add 4 staging models — intermediate not needed; mart consumes staging directly
+- [x] Replace placeholder `fct_inventory_adjustments` and `fct_inventory_snapshot` with full impl (90-day window for snapshot merge)
+- [x] Add new sources to `sources.yml`
+- [x] Implement `validate.py` (count comparison) + CLI command (`--tolerance` flag)
+- [ ] Record VCR cassettes for new endpoints + count.json — DEFERRED, used `respx` mocks (matches phase-04 pattern; live cassettes need real Haravan token)
+- [x] Write tests (16 extractors + validate cases); cartesian batching correctness asserted
+- [ ] Manual: `haravan-elt run-all` / `validate` against live shop — DEFERRED, needs live token
+- [ ] Verify `fct_inventory_snapshot` incremental over multiple days — DEFERRED, needs real data
 
 ## Success Criteria
 

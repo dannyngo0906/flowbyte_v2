@@ -67,3 +67,39 @@ models:
     columns:
       - name: location_id
         tests: [unique, not_null]
+
+  - name: stg_haravan__inventory_adjustments
+    description: "One row per inventory adjustment event."
+    columns:
+      - name: adjustment_id
+        tests: [unique, not_null]
+      - name: variant_id
+        tests: [not_null]
+      - name: location_id
+        tests: [not_null]
+
+  - name: stg_haravan__inventory_locations
+    description: "One row per (location, variant, snapshot_date)."
+    columns:
+      - name: location_id
+        tests: [not_null]
+      - name: variant_id
+        tests: [not_null]
+      - name: snapshot_date
+        tests: [not_null]
+      - name: available_quantity
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+              config:
+                severity: warn
+
+  - name: stg_haravan__custom_collections
+    columns:
+      - name: collection_id
+        tests: [unique, not_null]
+
+  - name: stg_haravan__smart_collections
+    columns:
+      - name: collection_id
+        tests: [unique, not_null]

@@ -74,11 +74,11 @@ def test_invalid_iso_since_exit_2(cli_env: str) -> None:
     assert result.exit_code == 2
 
 
-def test_validate_returns_exit_2_until_phase_09(cli_env: str) -> None:
+def test_validate_unknown_domain_exit_2(cli_env: str) -> None:
     del cli_env
-    result = runner.invoke(app, ["validate", "orders"])
+    result = runner.invoke(app, ["validate", "nope"])
     assert result.exit_code == 2
-    assert "phase-09" in result.stderr
+    assert "unknown domain" in result.stderr
 
 
 def test_status_runs_against_empty_db(cli_env: str) -> None:
