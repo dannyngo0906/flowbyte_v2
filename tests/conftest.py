@@ -49,3 +49,41 @@ def fake_settings_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "")
     monkeypatch.setenv("LOG_FORMAT", "console")
+
+
+# ---------------------------------------------------------- Postgres integration
+
+PG_DSN = "postgresql://elt_user:elt_pass@localhost:5434/haravan"
+
+
+def _pg_reachable() -> bool:
+    import psycopg
+
+    try:
+        with psycopg.connect(PG_DSN, connect_timeout=2) as _:
+            return True
+    except Exception:  # noqa: BLE001
+        return False
+
+
+@pytest.fixture(scope="session")
+def pg_dsn() -> str:
+    """Real Postgres DSN for integration tests. Skips if container is down."""
+    if not _pg_reachable():
+        pytest.skip("Postgres at localhost:5434 not reachable; run `make db-up` first.")
+    return PG_DSN
+
+
+@pytest.fixture
+def pg_clean(pg_dsn: str) -> Iterator[str]:
+    """Truncate raw + meta tables so each integration test starts empty."""
+    import psycopg
+
+    cleanup_sql = (
+        "TRUNCATE raw.haravan_orders, meta.sync_state, meta.run_log RESTART IDENTITY CASCADE"
+    )
+    with psycopg.connect(pg_dsn) as conn:
+        conn.execute(cleanup_sql)
+    yield pg_dsn
+    with psycopg.connect(pg_dsn) as conn:
+        conn.execute(cleanup_sql)
