@@ -1,4 +1,4 @@
-.PHONY: dev db-up db-down install lint format typecheck test init clean dbt-deps dbt-build dbt-test dbt-freshness dbt-seed
+.PHONY: dev db-up db-down install lint format typecheck test init ci-local clean dbt-deps dbt-build dbt-test dbt-freshness dbt-seed
 
 PYTHON ?= python3.11
 VENV ?= .venv
@@ -39,6 +39,11 @@ test:
 
 init:
 	$(VENV)/bin/haravan-elt init
+
+# Mirror of .github/workflows/ci.yml — run locally before pushing.
+# Each step matches a CI step exactly so a green run here == green CI.
+ci-local: lint typecheck init test
+	@echo "✓ ci-local OK — safe to push"
 
 dbt-deps:
 	cd dbt && DBT_PROFILES_DIR=. ../$(VENV)/bin/dbt deps

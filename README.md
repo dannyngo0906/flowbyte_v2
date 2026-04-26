@@ -1,5 +1,9 @@
 # haravan-elt
 
+[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+
+> Replace `OWNER/REPO` in the badge URL above after pushing to GitHub.
+
 Self-hosted ELT pipeline for Haravan: Omni API → PostgreSQL JSONB → dbt star schema.
 Single Python 3.11 process, idempotent re-runs, cron-driven daily incremental,
 Telegram notifications. ~8 weeks of work delivered as one CLI binary.
@@ -120,6 +124,7 @@ See `docs/system-architecture.md` for component-level detail.
 make test            # pytest with coverage gate (--cov-fail-under=70)
 make lint            # ruff check + format check
 make typecheck       # mypy strict
+make ci-local        # mirrors .github/workflows/ci.yml — run before pushing
 make dbt-build       # dbt build --select staging
 make dbt-test
 make db-up / db-down # Postgres dev container

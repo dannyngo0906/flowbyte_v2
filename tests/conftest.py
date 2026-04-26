@@ -55,7 +55,10 @@ def fake_settings_env(monkeypatch: pytest.MonkeyPatch) -> None:
 
 # ---------------------------------------------------------- Postgres integration
 
-PG_DSN = "postgresql://elt_user:elt_pass@localhost:5434/haravan"
+# CI sets `DATABASE_URL` directly; dev defaults to the docker-compose container.
+# `_isolate_env` strips DATABASE_URL inside tests, so capture it once at import
+# time before the fixture scrubs the environment.
+PG_DSN = os.environ.get("DATABASE_URL", "postgresql://elt_user:elt_pass@localhost:5434/haravan")
 
 
 def _pg_reachable() -> bool:
@@ -72,7 +75,7 @@ def _pg_reachable() -> bool:
 def pg_dsn() -> str:
     """Real Postgres DSN for integration tests. Skips if container is down."""
     if not _pg_reachable():
-        pytest.skip("Postgres at localhost:5434 not reachable; run `make db-up` first.")
+        pytest.skip(f"Postgres at {PG_DSN} not reachable; run `make db-up` first.")
     return PG_DSN
 
 

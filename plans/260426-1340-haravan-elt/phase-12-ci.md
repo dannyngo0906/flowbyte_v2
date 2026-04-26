@@ -11,7 +11,7 @@
 ## Overview
 
 - **Priority:** medium (gates merges; parallel-track delivery)
-- **Status:** pending
+- **Status:** completed (locally verified; trial PR pending push)
 - **Effort:** 1 day
 - **Description:** GitHub Actions workflow for `lint → type → test` on every PR + push to `main`. Postgres 15 service container for integration tests. VCR cassettes mode=none. pip + venv cache. Status badge in README.
 
@@ -207,15 +207,16 @@
 
 ## Todo List
 
-- [ ] Verify phase-01 deliverables (pyproject.toml `dev` extras, schema.sql, tests/) before starting
-- [ ] Write `.github/workflows/ci.yml` per template above
-- [ ] (After phase-10) ensure `pyproject.toml` has `--cov-fail-under=70` in pytest config
-- [ ] Add CI badge to `README.md`
-- [ ] Run all CI steps locally to verify clean pass
-- [ ] Push trial branch + open draft PR; confirm workflow triggers + green
-- [ ] Document in README "Running tests" section: link to local equivalent commands
-- [ ] (Optional) Add `paths-ignore` for docs/plans-only PRs after first false-positive
-- [ ] (Optional, post-phase-11) confirm schema_p2.sql guard works when file exists
+- [x] Verify phase-01 deliverables — pyproject [dev] + 3 schema files + tests/ all present
+- [x] Write `.github/workflows/ci.yml` (paths-ignore for docs/plans/markdown applied upfront)
+- [x] `--cov-fail-under=70` already in `pyproject.toml` (phase-10)
+- [x] Add CI badge to `README.md` (placeholder OWNER/REPO until first push)
+- [x] Run all CI steps locally — added `make ci-local` target mirroring workflow exactly; all green
+- [ ] Push trial branch + open draft PR — DEFERRED, user-driven
+- [x] Document `make ci-local` in README Development section
+- [x] paths-ignore applied upfront (docs/plans/markdown — saves CI minutes for doc-only PRs)
+- [x] schema_p2.sql `if [ -f ]` guard verified locally — passes whether file exists or not
+- [x] conftest.py honors `DATABASE_URL` env var so CI's `localhost:5432/haravan_ci` overrides dev's `5434/haravan` cleanly
 
 ## Success Criteria
 

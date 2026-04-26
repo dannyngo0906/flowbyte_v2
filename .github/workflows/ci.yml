@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "plans/**"
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "plans/**"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint + Type + Test
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: haravan_ci
+          POSTGRES_PASSWORD: haravan_ci
+          POSTGRES_DB: haravan_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U haravan_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # Tests connect via this DSN (matches conftest's hardcoded localhost:5434
+      # in dev, but in CI Postgres listens on 5432). conftest.py uses 5434 by
+      # default — we override with PG_DSN env var via DATABASE_URL below.
+      DATABASE_URL: postgresql://haravan_ci:haravan_ci@localhost:5432/haravan_ci
+      # Dummy creds — VCR cassettes mode=none + respx mocks mean no live calls.
+      HARAVAN_SHOP_DOMAIN: ci.myharavan.com
+      HARAVAN_ACCESS_TOKEN: dummy-access
+      HARAVAN_REFRESH_TOKEN: dummy-refresh
+      HARAVAN_CLIENT_ID: dummy-client
+      HARAVAN_CLIENT_SECRET: dummy-secret
+      HARAVAN_RATE_LIMIT_PER_SEC: "100"
+      HARAVAN_RATE_LIMIT_BURST: "1000"
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_CHAT_ID: ""
+      LOG_FORMAT: console
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Ruff format check
+        run: ruff format --check src tests
+
+      - name: Ruff lint
+        run: ruff check src tests
+
+      - name: Mypy
+        run: mypy src
+
+      - name: Init Postgres schemas
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f src/haravan_elt/meta/schema.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f src/haravan_elt/meta/raw_tables.sql
+          if [ -f src/haravan_elt/meta/schema_p2.sql ]; then
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f src/haravan_elt/meta/schema_p2.sql
+          fi
+
+      - name: Pytest with coverage
+        run: pytest
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          retention-days: 7
+          if-no-files-found: ignore
