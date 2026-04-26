@@ -19,19 +19,13 @@ from rich.console import Console
 
 from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.config import load_settings
-from haravan_elt.extractors.base import BaseExtractor
-from haravan_elt.extractors.orders import OrdersExtractor
+from haravan_elt.extractors.registry import EXTRACTORS
 from haravan_elt.loaders.postgres import PostgresLoader
 from haravan_elt.logging import setup_logging
 from haravan_elt.meta.state import StateManager
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 console = Console()
-
-# Domain → extractor class. Phase-04+ extends this map.
-EXTRACTOR_REGISTRY: dict[str, type[BaseExtractor]] = {
-    "orders": OrdersExtractor,
-}
 
 
 def _parse_iso_arg(name: str, value: str | None, default_tz: ZoneInfo) -> datetime | None:
@@ -80,8 +74,8 @@ def extract(
     if mode not in {"full", "incremental"}:
         typer.echo(f"invalid --mode: {mode!r} (use 'full' or 'incremental')", err=True)
         raise typer.Exit(2)
-    if domain not in EXTRACTOR_REGISTRY:
-        typer.echo(f"unknown domain: {domain}; known: {sorted(EXTRACTOR_REGISTRY)}", err=True)
+    if domain not in EXTRACTORS:
+        typer.echo(f"unknown domain: {domain}; known: {sorted(EXTRACTORS)}", err=True)
         raise typer.Exit(2)
 
     settings = load_settings()
@@ -99,12 +93,14 @@ def extract(
         client = HaravanClient(settings)
         loader = PostgresLoader(dsn)
         state = StateManager(dsn)
-        extractor = EXTRACTOR_REGISTRY[domain](client, loader, state, run_id)
+        extractor = EXTRACTORS[domain](client, loader, state, run_id)
 
         state.start_run(run_id, domain, mode)
         try:
             rows, max_ts = extractor.idempotent_load(mode, since=since_dt, until=until_dt)
-            if max_ts is not None and not dry_run:
+            # Skip watermark write for full-refresh-only domains (e.g. locations) —
+            # their max_ts is synthetic (datetime.now()) and would pollute sync_state.
+            if max_ts is not None and not dry_run and extractor.supports_incremental:
                 state.update_watermark(domain, max_ts, run_id)
             state.end_run(run_id, rows, "success")
             console.print(

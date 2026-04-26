@@ -1,17 +1,22 @@
-"""Abstract BaseExtractor + the shared idempotent-load orchestration.
+"""Abstract BaseExtractor + reusable templates.
 
-Concrete extractors implement `iter_pages` (HTTP pagination) and `to_raw_row`
-(API-item → upsert-row mapper). The reusable load loop lives here so all
-domains get identical batching, watermark, and run-log semantics.
+`BaseExtractor` defines the load-loop contract. `PaginatedListExtractor`
+implements the standard offset-paginated `/com/<domain>.json` pattern so most
+P0/P1/P2 domains only need to declare a path + response wrapper key.
 """
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from datetime import datetime
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
+
+from psycopg.types.json import Jsonb
+
+from haravan_elt.extractors._helpers import parse_haravan_timestamp
 
 if TYPE_CHECKING:
     from haravan_elt.client.haravan import HaravanClient
@@ -26,11 +31,13 @@ class BaseExtractor(ABC):
         domain      - identifier used in `meta.sync_state` and `meta.run_log`
         raw_table   - target qualified table name, e.g. "raw.haravan_orders"
         conflict_col - PK column for ON CONFLICT (defaults to "id")
+        supports_incremental - False for full-refresh-only domains (locations)
     """
 
     domain: str
     raw_table: str
     conflict_col: str = "id"
+    supports_incremental: bool = True
 
     def __init__(
         self,
@@ -69,8 +76,10 @@ class BaseExtractor(ABC):
           as a default `since` floor when caller didn't pass one.
         - Watermark itself is NOT updated here — caller (CLI) updates after
           all pages succeed, in a separate transaction (research §5).
+        - Domains with `supports_incremental=False` ignore `mode` semantics
+          but still report max_updated for watermark logging.
         """
-        if mode == "incremental" and since is None:
+        if mode == "incremental" and self.supports_incremental and since is None:
             since = self.state.get_watermark(self.domain)
 
         rows_total = 0
@@ -86,3 +95,60 @@ class BaseExtractor(ABC):
                 if max_updated is None or row_ts > max_updated:
                     max_updated = row_ts
         return rows_total, max_updated
+
+
+class PaginatedListExtractor(BaseExtractor):
+    """Standard offset-paginated `/com/<domain>.json` template.
+
+    Subclass needs only:
+        PATH         - endpoint, e.g. "/com/customers.json"
+        RESPONSE_KEY - wrapper key in JSON, e.g. "customers"
+        EXTRA_PARAMS - static query params merged into every request
+
+    `to_raw_row` defaults to a JSONB-payload + updated_at row; override for
+    domains with non-standard timestamp fields.
+    """
+
+    PATH: str
+    RESPONSE_KEY: str
+    # Read-only mapping prevents accidental in-place mutation that would leak
+    # to sibling subclasses sharing the parent's empty default.
+    EXTRA_PARAMS: Mapping[str, Any] = MappingProxyType({})
+
+    def __init__(self, *args: Any, page_limit: int = 250, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._limit = page_limit
+
+    def iter_pages(
+        self,
+        since: datetime | None = None,
+        until: datetime | None = None,
+    ) -> Iterator[list[dict[str, Any]]]:
+        page = 1
+        while True:
+            params: dict[str, Any] = {
+                "page": page,
+                "limit": self._limit,
+                **self.EXTRA_PARAMS,
+            }
+            if since is not None:
+                params["updated_at_min"] = since.isoformat()
+            if until is not None:
+                params["updated_at_max"] = until.isoformat()
+            resp = self.client.get(self.PATH, params=params)
+            items: list[dict[str, Any]] = resp.json().get(self.RESPONSE_KEY, [])
+            if not items:
+                return
+            yield items
+            # EOF: short page (research §2 — Haravan has no Link header / total).
+            if len(items) < self._limit:
+                return
+            page += 1
+
+    def to_raw_row(self, item: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "id": item["id"],
+            "payload": Jsonb(item),
+            "updated_at": parse_haravan_timestamp(item["updated_at"]),
+            "source_run_id": str(self.run_id),
+        }

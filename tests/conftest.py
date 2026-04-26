@@ -80,7 +80,9 @@ def pg_clean(pg_dsn: str) -> Iterator[str]:
     import psycopg
 
     cleanup_sql = (
-        "TRUNCATE raw.haravan_orders, meta.sync_state, meta.run_log RESTART IDENTITY CASCADE"
+        "TRUNCATE raw.haravan_orders, raw.haravan_customers, raw.haravan_products, "
+        "raw.haravan_locations, meta.sync_state, meta.run_log "
+        "RESTART IDENTITY CASCADE"
     )
     with psycopg.connect(pg_dsn) as conn:
         conn.execute(cleanup_sql)
