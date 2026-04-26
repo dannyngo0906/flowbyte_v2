@@ -99,3 +99,31 @@ class StateManager:
         """
         with psycopg.connect(self._dsn, row_factory=dict_row) as conn:
             return conn.execute(sql, (limit,)).fetchall()
+
+    def list_status(self) -> list[dict[str, Any]]:
+        """Per-domain snapshot: high watermark + most recent run row.
+
+        LATERAL join picks the latest `run_log` row per domain so the result is
+        always 1 row per known domain, regardless of how many runs exist.
+        """
+        sql = """
+            SELECT s.domain,
+                   s.last_updated_at,
+                   r.status,
+                   r.mode,
+                   r.started_at,
+                   r.ended_at,
+                   r.rows_ingested,
+                   r.error_message
+              FROM meta.sync_state s
+              LEFT JOIN LATERAL (
+                  SELECT status, mode, started_at, ended_at, rows_ingested, error_message
+                    FROM meta.run_log
+                   WHERE domain = s.domain
+                   ORDER BY started_at DESC
+                   LIMIT 1
+              ) r ON true
+             ORDER BY s.domain
+        """
+        with psycopg.connect(self._dsn, row_factory=dict_row) as conn:
+            return conn.execute(sql).fetchall()
