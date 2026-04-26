@@ -1,0 +1,13 @@
+haravan_elt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('PG_HOST', 'localhost') }}"
+      user: "{{ env_var('PG_USER', 'elt_user') }}"
+      password: "{{ env_var('PG_PASSWORD', 'elt_pass') }}"
+      port: "{{ env_var('PG_PORT', 5434) | int }}"
+      dbname: "{{ env_var('PG_DATABASE', 'haravan') }}"
+      schema: "{{ env_var('PG_SCHEMA', 'staging') }}"
+      threads: 4
+      keepalives_idle: 0

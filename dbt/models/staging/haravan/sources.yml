@@ -1,0 +1,51 @@
+version: 2
+
+sources:
+  - name: raw_haravan
+    database: haravan
+    schema: raw
+    description: "Raw Haravan API payloads landed by haravan-elt extract."
+    loaded_at_field: ingested_at
+    freshness:
+      warn_after: { count: 24, period: hour }
+      error_after: { count: 48, period: hour }
+    tables:
+      - name: orders
+        identifier: haravan_orders
+        description: "Full order envelope including line_items, refunds, transactions."
+        freshness:
+          warn_after: { count: 6, period: hour }
+          error_after: { count: 24, period: hour }
+        columns:
+          - name: id
+            tests: [not_null, unique]
+          - name: payload
+            tests: [not_null]
+          - name: updated_at
+            tests: [not_null]
+
+      - name: customers
+        identifier: haravan_customers
+        freshness:
+          warn_after: { count: 12, period: hour }
+          error_after: { count: 48, period: hour }
+        columns:
+          - name: id
+            tests: [not_null, unique]
+
+      - name: products
+        identifier: haravan_products
+        freshness:
+          warn_after: { count: 24, period: hour }
+          error_after: { count: 72, period: hour }
+        columns:
+          - name: id
+            tests: [not_null, unique]
+
+      - name: locations
+        identifier: haravan_locations
+        # Locations is full-refresh; no freshness check (every run rewrites).
+        freshness: null
+        columns:
+          - name: id
+            tests: [not_null, unique]

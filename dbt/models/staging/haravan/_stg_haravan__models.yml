@@ -1,0 +1,69 @@
+version: 2
+
+models:
+  - name: stg_haravan__orders
+    description: "Order envelope, JSONB payload typed into columns. Refunds/transactions kept as JSONB for sibling staging models to explode."
+    columns:
+      - name: order_id
+        description: "Haravan order PK"
+        tests: [unique, not_null]
+      - name: customer_id
+        description: "Foreign key into stg_haravan__customers (may be null for guest checkouts)."
+      - name: total_price_vnd
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+  - name: stg_haravan__order_refunds
+    description: "One row per refund inside an order's refunds[] array."
+    columns:
+      - name: refund_id
+        tests: [unique, not_null]
+      - name: order_id
+        tests: [not_null]
+      - name: refund_amount_vnd
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+  - name: stg_haravan__order_transactions
+    description: "Order-level + refund-level transactions, unioned. Refund transactions carry refund_id."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: order_id
+        tests: [not_null]
+      - name: kind
+        tests:
+          - accepted_values:
+              values: ['sale', 'refund', 'authorization', 'capture', 'void', 'change']
+              quote: true
+              config:
+                severity: warn
+
+  - name: stg_haravan__customers
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+
+  - name: stg_haravan__products
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+
+  - name: stg_haravan__variants
+    description: "One row per variant exploded from product.variants[]."
+    columns:
+      - name: variant_id
+        tests: [unique, not_null]
+      - name: product_id
+        tests: [not_null]
+      - name: price_vnd
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+  - name: stg_haravan__locations
+    columns:
+      - name: location_id
+        tests: [unique, not_null]

@@ -108,6 +108,7 @@ dbt/target/
 dbt/logs/
 dbt/dbt_packages/
 dbt/profiles.yml
+dbt/package-lock.yml
 
 # haravan-elt local lockfiles
 *.lock

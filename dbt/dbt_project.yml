@@ -1,0 +1,38 @@
+name: haravan_elt
+version: "0.1.0"
+config-version: 2
+profile: haravan_elt
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+analysis-paths: ["analyses"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages", "logs"]
+
+vars:
+  shop_timezone: "Asia/Ho_Chi_Minh"
+
+models:
+  haravan_elt:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: ephemeral
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
+      core:
+        +materialized: table
+
+seeds:
+  haravan_elt:
+    +schema: marts
+
+quoting:
+  database: false
+  schema: false
+  identifier: false

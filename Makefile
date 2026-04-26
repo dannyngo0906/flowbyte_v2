@@ -1,4 +1,4 @@
-.PHONY: dev db-up db-down install lint format typecheck test init clean
+.PHONY: dev db-up db-down install lint format typecheck test init clean dbt-deps dbt-build dbt-test dbt-freshness dbt-seed
 
 PYTHON ?= python3.11
 VENV ?= .venv
@@ -39,6 +39,21 @@ test:
 
 init:
 	$(VENV)/bin/haravan-elt init
+
+dbt-deps:
+	cd dbt && DBT_PROFILES_DIR=. ../$(VENV)/bin/dbt deps
+
+dbt-build:
+	cd dbt && DBT_PROFILES_DIR=. ../$(VENV)/bin/dbt build --select staging
+
+dbt-test:
+	cd dbt && DBT_PROFILES_DIR=. ../$(VENV)/bin/dbt test --select staging
+
+dbt-freshness:
+	cd dbt && DBT_PROFILES_DIR=. ../$(VENV)/bin/dbt source freshness
+
+dbt-seed:
+	psql "$$DATABASE_URL" -f scripts/seed-raw-fixtures.sql
 
 clean:
 	rm -rf $(VENV) .pytest_cache .ruff_cache .mypy_cache .coverage coverage.xml dbt/target dbt/logs
