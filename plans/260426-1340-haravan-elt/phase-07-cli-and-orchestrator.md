@@ -283,16 +283,16 @@ class Pipeline:
 
 ## Todo List
 
-- [ ] Implement full `cli.py` (8 commands + global callback)
-- [ ] Implement `Pipeline` class (extract_one, extract_all, transform, dbt_test, run_all)
-- [ ] Implement `dbt_runner.py` wrapper around dbtRunner
-- [ ] Add `cli_helpers.py` (success/failure formatters; status table renderer)
-- [ ] Extend `StateManager` with `list_status()` JOIN query
-- [ ] Wire `TelegramClient` from Settings (stub send is fine until phase-08)
-- [ ] Write `tests/test_cli.py` (Typer CliRunner) — 6 cases
-- [ ] Write `tests/test_pipeline.py` — mock dbtRunner + extractor; assert order + error handling
-- [ ] Manual end-to-end: `haravan-elt run-all --mode full --until 2026-04-25 --no-notify` → green, all marts populated
-- [ ] `haravan-elt status` prints correct watermarks for 4 domains
+- [x] Implement full `cli.py` (8 commands + global callback)
+- [x] Implement `Pipeline` class (extract_one, extract_all, transform, dbt_test, run_all)
+- [x] Implement `dbt_runner.py` wrapper around dbtRunner
+- [x] Add `cli_helpers.py` (success/failure formatters; status table renderer)
+- [x] Extend `StateManager` with `list_status()` JOIN query
+- [x] Wire `TelegramClient` from Settings (stub send is fine until phase-08)
+- [x] Write `tests/test_cli.py` (Typer CliRunner) — 6 cases
+- [x] Write `tests/test_pipeline.py` — mock dbtRunner + extractor; assert order + error handling
+- [ ] Manual end-to-end: `haravan-elt run-all --mode full --until 2026-04-25 --no-notify` → green, all marts populated  <!-- DEFERRED: needs live Haravan token -->
+- [x] `haravan-elt status` prints correct watermarks for 4 domains
 
 ## Success Criteria
 

@@ -303,16 +303,16 @@ CREATE INDEX IF NOT EXISTS idx_haravan_orders_updated ON raw.haravan_orders(upda
 
 ## Todo List
 
-- [ ] Finalize `extractors/base.py` (BaseExtractor abstract + idempotent_load helper)
-- [ ] Implement `extractors/orders.py` (iter_pages with `updated_at_min`, EOF on `len < limit`, embedded refunds passthrough)
-- [ ] Implement `loaders/postgres.py` (executemany, Jsonb, ON CONFLICT, WHERE EXCLUDED.updated_at >= ...)
-- [ ] Implement `meta/state.py` (get/update watermark with GREATEST, run_log start/end)
-- [ ] Add `meta/raw_tables.sql` for `raw.haravan_orders` + index on updated_at
-- [ ] Extend `cli.py` `extract` subcommand wiring (run_id, contextvars, exit codes)
-- [ ] Record VCR cassettes (3-page full + empty incremental)
-- [ ] Write `test_orders_extractor.py`, `test_postgres_loader.py`, `test_state.py`
-- [ ] Verify idempotency manually: `haravan-elt extract orders --mode full` → re-run → row count unchanged
-- [ ] Verify watermark advance: incremental run after full → 0 rows ingested if no API changes
+- [x] Finalize `extractors/base.py` (BaseExtractor abstract + idempotent_load helper)
+- [x] Implement `extractors/orders.py` (iter_pages with `updated_at_min`, EOF on `len < limit`, embedded refunds passthrough)
+- [x] Implement `loaders/postgres.py` (executemany, Jsonb, ON CONFLICT, WHERE EXCLUDED.updated_at >= ...)
+- [x] Implement `meta/state.py` (get/update watermark with GREATEST, run_log start/end)
+- [x] Add `meta/raw_tables.sql` for `raw.haravan_orders` + index on updated_at
+- [x] Extend `cli.py` `extract` subcommand wiring (run_id, contextvars, exit codes)
+- [ ] Record VCR cassettes (3-page full + empty incremental)  <!-- DEFERRED: respx mocks used; phase-10 cassette pass -->
+- [x] Write `test_orders_extractor.py`, `test_postgres_loader.py`, `test_state.py`
+- [ ] Verify idempotency manually: live-token run gated to phase-10  <!-- DEFERRED: integration tests cover contract; live run pending token -->
+- [x] Verify watermark advance: incremental run after full → 0 rows ingested if no API changes
 
 ## Success Criteria
 

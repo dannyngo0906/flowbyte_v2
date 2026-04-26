@@ -168,16 +168,16 @@ Extractor registry:
 
 ## Todo List
 
-- [ ] Append DDL for `raw.haravan_customers/products/locations` (LIKE haravan_orders pattern or explicit)
-- [ ] Implement `customers.py` extractor
-- [ ] Implement `products.py` extractor (variants embedded passthrough)
-- [ ] Implement `locations.py` extractor (full refresh, no pagination)
-- [ ] Add `extractors/registry.py` with `EXTRACTORS` dict + `DOMAIN_ORDER`
-- [ ] Wire registry in `cli.py extract` subcommand
-- [ ] Record 3 VCR cassettes (customers, products, locations)
-- [ ] Write 3 test files (parity with `test_orders_extractor.py`)
-- [ ] Manual verify: 4 separate `haravan-elt extract <domain>` runs → 4 raw tables populated
-- [ ] Verify watermark advances correctly per domain (no cross-contamination)
+- [x] Append DDL for `raw.haravan_customers/products/locations` (LIKE haravan_orders pattern or explicit)
+- [x] Implement `customers.py` extractor
+- [x] Implement `products.py` extractor (variants embedded passthrough)
+- [x] Implement `locations.py` extractor (full refresh, no pagination)
+- [x] Add `extractors/registry.py` with `EXTRACTORS` dict + `DOMAIN_ORDER`
+- [x] Wire registry in `cli.py extract` subcommand
+- [ ] Record 3 VCR cassettes (customers, products, locations)  <!-- DEFERRED: respx mocks used; phase-10 cassette pass -->
+- [x] Write 3 test files (parity with `test_orders_extractor.py`)
+- [ ] Manual verify: 4 separate `haravan-elt extract <domain>` runs → 4 raw tables populated  <!-- DEFERRED: needs live token -->
+- [x] Verify watermark advances correctly per domain (no cross-contamination)
 
 ## Success Criteria
 

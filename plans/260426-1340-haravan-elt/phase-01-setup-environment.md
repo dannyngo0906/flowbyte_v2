@@ -300,21 +300,21 @@ haravan-elt/
 
 ## Todo List
 
-- [ ] Init git repo + branch `feat/haravan-elt`
-- [ ] Write `pyproject.toml` (PEP 621, all deps + dev deps + ruff/mypy/pytest config)
-- [ ] Write `docker-compose.yml` (postgres:15-alpine, healthcheck, volume)
-- [ ] Write `.env.example` matching PRD §9
-- [ ] Write `Makefile` (dev/test/lint/format/typecheck/init targets)
-- [ ] Write `.pre-commit-config.yaml` (ruff-format + ruff)
-- [ ] Write `.gitignore`
-- [ ] Create `src/haravan_elt/` package skeleton (cli, config, pipeline, client/, extractors/, loaders/, meta/)
-- [ ] Write `src/haravan_elt/meta/schema.sql` (4 schemas + 2 meta tables verbatim PRD §8)
-- [ ] Stub `cli.py` with `init` subcommand running schema.sql
-- [ ] Stub `extractors/base.py` abstract class
-- [ ] Write `tests/conftest.py` + `tests/test_smoke.py`
-- [ ] Write `deploy/crontab.example` + `scripts/run-daily.sh` (stub)
-- [ ] Write `README.md` skeleton (full version in phase-10)
-- [ ] Verify `make dev && haravan-elt init && make lint && make typecheck && make test` all green
+- [x] Init git repo + branch `feat/haravan-elt`
+- [x] Write `pyproject.toml` (PEP 621, all deps + dev deps + ruff/mypy/pytest config)
+- [x] Write `docker-compose.yml` (postgres:15-alpine, healthcheck, volume)
+- [x] Write `.env.example` matching PRD §9
+- [x] Write `Makefile` (dev/test/lint/format/typecheck/init targets)
+- [x] Write `.pre-commit-config.yaml` (ruff-format + ruff)
+- [x] Write `.gitignore`
+- [x] Create `src/haravan_elt/` package skeleton (cli, config, pipeline, client/, extractors/, loaders/, meta/)
+- [x] Write `src/haravan_elt/meta/schema.sql` (4 schemas + 2 meta tables verbatim PRD §8)
+- [x] Stub `cli.py` with `init` subcommand running schema.sql
+- [x] Stub `extractors/base.py` abstract class
+- [x] Write `tests/conftest.py` + `tests/test_smoke.py`
+- [x] Write `deploy/crontab.example` + `scripts/run-daily.sh` (stub)
+- [ ] Write `README.md` skeleton (full version in phase-10)  <!-- DEFERRED: full README rewrite is phase-10 deliverable -->
+- [x] Verify `make dev && haravan-elt init && make lint && make typecheck && make test` all green
 
 ## Success Criteria
 

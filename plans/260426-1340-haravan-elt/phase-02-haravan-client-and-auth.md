@@ -338,17 +338,17 @@ HaravanAPIError(Exception)
 
 ## Todo List
 
-- [ ] Expand `src/haravan_elt/config.py` to nested settings (Haravan/DB/Telegram + root)
-- [ ] Create `src/haravan_elt/client/exceptions.py` (4 subclasses)
-- [ ] Create `src/haravan_elt/client/rate_limit.py` (LeakyBucket factory)
-- [ ] Create `src/haravan_elt/client/haravan.py` (HaravanClient + tenacity + refresh + write-back)
-- [ ] Create `src/haravan_elt/client/telegram.py` stub (fail-soft)
-- [ ] Add `setup_logging()` helper (structlog JSON/console toggle)
-- [ ] Write `tests/conftest.py` VCR fixture (filter `authorization`, `record_mode=none`)
-- [ ] Record VCR cassettes: 200, 401-refresh, 429, 500, 500x5
-- [ ] Write `tests/test_haravan_client.py` covering all 6 cases above
-- [ ] Verify `make typecheck` passes (mypy strict)
-- [ ] Verify `make test` covers `client/` ≥80%
+- [x] Expand `src/haravan_elt/config.py` to nested settings (Haravan/DB/Telegram + root)
+- [x] Create `src/haravan_elt/client/exceptions.py` (4 subclasses)
+- [x] Create `src/haravan_elt/client/rate_limit.py` (LeakyBucket factory)
+- [x] Create `src/haravan_elt/client/haravan.py` (HaravanClient + tenacity + refresh + write-back)
+- [x] Create `src/haravan_elt/client/telegram.py` stub (fail-soft)
+- [x] Add `setup_logging()` helper (structlog JSON/console toggle)
+- [x] Write `tests/conftest.py` VCR fixture (filter `authorization`, `record_mode=none`)
+- [ ] Record VCR cassettes: 200, 401-refresh, 429, 500, 500x5  <!-- DEFERRED: respx mocks used; phase-10 cassette pass -->
+- [x] Write `tests/test_haravan_client.py` covering all 6 cases above
+- [x] Verify `make typecheck` passes (mypy strict)
+- [x] Verify `make test` covers `client/` ≥80%
 
 ## Success Criteria
 

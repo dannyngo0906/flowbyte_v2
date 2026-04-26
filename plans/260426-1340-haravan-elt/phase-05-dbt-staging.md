@@ -352,16 +352,16 @@ raw.haravan_locations ──▶ stg_haravan__locations
 
 ## Todo List
 
-- [ ] Init `dbt/` project (`dbt_project.yml`, `profiles.yml.example`, `packages.yml`)
-- [ ] Run `dbt deps` to install dbt-utils
-- [ ] Write `sources.yml` (4 source tables + freshness)
-- [ ] Write 7 staging models: orders, order_refunds, order_transactions, customers, products, variants, locations
-- [ ] Write `_stg_haravan__models.yml` (PK tests + monetary expression_is_true)
-- [ ] Update `Makefile` with `dbt-deps/build/test/freshness`
-- [ ] Write `tests/test_dbt_smoke.py` (parse + compile)
-- [ ] Local verify: `make dbt-deps && make dbt-build` → all 7 models created, all PK tests pass
-- [ ] Verify refunds + transactions explode produces expected rows from sample order JSON
-- [ ] Document profile setup in README skeleton
+- [x] Init `dbt/` project (`dbt_project.yml`, `profiles.yml.example`, `packages.yml`)
+- [x] Run `dbt deps` to install dbt-utils
+- [x] Write `sources.yml` (4 source tables + freshness)
+- [x] Write 7 staging models: orders, order_refunds, order_transactions, customers, products, variants, locations
+- [x] Write `_stg_haravan__models.yml` (PK tests + monetary expression_is_true)
+- [x] Update `Makefile` with `dbt-deps/build/test/freshness`
+- [x] Write `tests/test_dbt_smoke.py` (parse + compile)
+- [x] Local verify: `make dbt-deps && make dbt-build` → all 7 models created, all PK tests pass
+- [x] Verify refunds + transactions explode produces expected rows from sample order JSON
+- [ ] Document profile setup in README skeleton  <!-- DEFERRED: README rewrite is phase-10 -->
 
 ## Success Criteria
 

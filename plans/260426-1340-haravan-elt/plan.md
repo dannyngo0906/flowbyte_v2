@@ -2,12 +2,14 @@
 title: "Haravan ELT Pipeline"
 description: "Self-hosted Python 3.11 ELT: Haravan Omni API → PostgreSQL JSONB → dbt star schema, CLI + Telegram notifications, full M0–M7 scope (~8 weeks)."
 name: Haravan ELT Pipeline
-status: pending
+status: in-progress
 priority: P1
 effort: ~8 weeks
+progress: 7/12 phases (~58%)
 branch: feat/haravan-elt
 date: 2026-04-26
 created: 2026-04-26
+last_synced: 2026-04-26
 tags: [elt, dbt, postgres, haravan, python]
 blockedBy: []
 blocks: []
@@ -23,20 +25,27 @@ See [`docs/tech-stack.md`](../../docs/tech-stack.md) — Python 3.11, httpx, ten
 
 ## Phase Status
 
-| # | Title | Milestone | Status | Effort |
-|---|-------|-----------|--------|--------|
-| 01 | Setup environment | M0 | pending | 3d |
-| 02 | Haravan client + auth | M1 | pending | 5d |
-| 03 | Orders extract + load | M1 | pending | 3d |
-| 04 | Multi-domain extractors (P0) | M2 | pending | 5d |
-| 05 | dbt staging | M3 | pending | 5d |
-| 06 | dbt marts (core) | M3 | pending | 5d |
-| 07 | CLI + orchestrator | M4 | pending | 4d |
-| 08 | Telegram notifications | M4 | pending | 2d |
-| 09 | P1 domains + validate | M5 | pending | 5d |
-| 10 | Hardening | M6 | pending | 5d |
-| 11 | Post-MVP domains | M7 | pending | 5d |
-| 12 | CI (GitHub Actions) | M6 (parallel) | pending | 1d |
+| # | Title | Milestone | Status | Commits | Effort |
+|---|-------|-----------|--------|---------|--------|
+| 01 | Setup environment | M0 | ✅ completed | d9e4ee4 | 3d |
+| 02 | Haravan client + auth | M1 | ✅ completed | 4fda5e6 + b951ace | 5d |
+| 03 | Orders extract + load | M1 | ✅ completed | 6f0c08b + 6886181 | 3d |
+| 04 | Multi-domain extractors (P0) | M2 | ✅ completed | f9500b9 + 541521c | 5d |
+| 05 | dbt staging | M3 | ✅ completed | ec2194c + 4128184 | 5d |
+| 06 | dbt marts (core) | M3 | ✅ completed | 5bb286f + 2209b91 | 5d |
+| 07 | CLI + orchestrator | M4 | ✅ completed | ccc650a + 1fb0780 | 4d |
+| 08 | Telegram notifications | M4 | pending | — | 2d |
+| 09 | P1 domains + validate | M5 | pending | — | 5d |
+| 10 | Hardening | M6 | pending | — | 5d |
+| 11 | Post-MVP domains | M7 | pending | — | 5d |
+| 12 | CI (GitHub Actions) | M6 (parallel) | pending | — | 1d |
+
+**Progress:** 7 / 12 phases done. Verification: 74/74 pytest pass (91% coverage), dbt build 95/95 nodes, 18 commits on `feat/haravan-elt`.
+
+**Deferred items (committed but not strictly checked off in phase todo lists):**
+- VCR cassette recording (phases 02/03/04) → used `respx` mocks; real cassettes need live Haravan token (phase-10 hardening)
+- Manual end-to-end verification with live token (phases 03/04/06/07) → blocked on user obtaining Haravan API credentials
+- README skeleton (phase-01 last todo) → README.md rewrite is phase-10 deliverable
 
 **Total:** ~48 dev-days ≈ 8 weeks (1 dev part-time).
 

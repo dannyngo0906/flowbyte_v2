@@ -370,15 +370,15 @@ FK key naming convention: `<entity>_key` BIGINT MD5-derived; natural keys preser
 
 ## Todo List
 
-- [ ] Write 3 intermediate models (orders__customer_joined, line_items_exploded, totals_with_refund_net)
-- [ ] Write 6 dim models (customers, products, variants, locations, date, payment_methods)
-- [ ] Write 4 active fact models (orders, order_lines, transactions, refunds) with merge/unique_key
-- [ ] Write 2 placeholder fact models (inventory_adjustments, inventory_snapshot)
-- [ ] Write `_marts_core.yml` with PK + relationships + expression_is_true tests
-- [ ] Local verify `dbt build --select marts` — all 12 models built
-- [ ] Verify FK relationships pass (run `dbt test`)
-- [ ] Verify incremental: re-run after adding 1 raw row → only that row appears in fct_orders
-- [ ] Verify `dim_date` covers 2020 → current+4yr range
+- [x] Write 3 intermediate models (orders__customer_joined, line_items_exploded, totals_with_refund_net)
+- [x] Write 6 dim models (customers, products, variants, locations, date, payment_methods)
+- [x] Write 4 active fact models (orders, order_lines, transactions, refunds) with merge/unique_key
+- [x] Write 2 placeholder fact models (inventory_adjustments, inventory_snapshot)
+- [x] Write `_marts_core.yml` with PK + relationships + expression_is_true tests
+- [x] Local verify `dbt build --select marts` — all 12 models built
+- [x] Verify FK relationships pass (run `dbt test`)
+- [ ] Verify incremental: re-run after adding 1 raw row → only that row appears in fct_orders  <!-- DEFERRED: incremental config validated by dbt build 95/95; live re-run gated on token -->
+- [x] Verify `dim_date` covers 2020 → current+4yr range
 
 ## Success Criteria
 
