@@ -1,0 +1,135 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Type-1 customer dim. Surrogate key = md5(customer_id)."
+    columns:
+      - name: customer_key
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [unique, not_null]
+
+  - name: dim_products
+    columns:
+      - name: product_key
+        tests: [unique, not_null]
+      - name: product_id
+        tests: [unique, not_null]
+
+  - name: dim_variants
+    columns:
+      - name: variant_key
+        tests: [unique, not_null]
+      - name: variant_id
+        tests: [unique, not_null]
+      - name: product_key
+        tests:
+          - relationships:
+              to: ref('dim_products')
+              field: product_key
+
+  - name: dim_locations
+    columns:
+      - name: location_key
+        tests: [unique, not_null]
+      - name: location_id
+        tests: [unique, not_null]
+
+  - name: dim_date
+    columns:
+      - name: date_key
+        tests: [unique, not_null]
+      - name: date_actual
+        tests: [unique, not_null]
+
+  - name: dim_payment_methods
+    columns:
+      - name: payment_method_key
+        tests: [unique, not_null]
+      - name: method_name
+        tests: [unique, not_null]
+
+  - name: fct_orders
+    description: "Grain: 1 row per order. Incremental on order_updated_at."
+    columns:
+      - name: order_key
+        tests: [unique, not_null]
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_key
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key
+      - name: location_key
+        tests:
+          - relationships:
+              to: ref('dim_locations')
+              field: location_key
+      - name: order_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: net_revenue_vnd
+        tests:
+          - dbt_utils.expression_is_true:
+              # Tautological vs computed total_refunded_vnd; kept as guard against
+              # accidental SQL drift in the int_ model arithmetic.
+              expression: "= total_price_vnd - total_refunded_vnd"
+      - name: total_refunded_haravan_vnd
+        # Drift signal: warn (not fail) if Haravan's reported total_refunded
+        # disagrees with our exploded refunds sum. Tolerance VND 1 to absorb
+        # rounding artifacts in stringified numerics.
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "is null or abs(coalesce(total_refunded_haravan_vnd, 0) - total_refunded_vnd) < 1"
+              config:
+                severity: warn
+
+  - name: fct_order_lines
+    description: "Grain: 1 row per (order, line_item)."
+    columns:
+      - name: line_key
+        tests: [unique, not_null]
+      - name: variant_key
+        tests:
+          - relationships:
+              to: ref('dim_variants')
+              field: variant_key
+      - name: product_key
+        tests:
+          - relationships:
+              to: ref('dim_products')
+              field: product_key
+
+  - name: fct_transactions
+    columns:
+      - name: transaction_key
+        tests: [unique, not_null]
+      - name: order_key
+        tests:
+          - relationships:
+              to: ref('fct_orders')
+              field: order_key
+      - name: payment_method_key
+        tests:
+          - relationships:
+              to: ref('dim_payment_methods')
+              field: payment_method_key
+
+  - name: fct_refunds
+    columns:
+      - name: refund_key
+        tests: [unique, not_null]
+      - name: order_key
+        tests:
+          - relationships:
+              to: ref('fct_orders')
+              field: order_key
+
+  - name: fct_inventory_adjustments
+    description: "Placeholder until phase-09 (M5)."
+
+  - name: fct_inventory_snapshot
+    description: "Placeholder until phase-09 (M5)."

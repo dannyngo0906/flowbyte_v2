@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: int_orders__line_items_exploded
+    description: "One row per order line item, JSONB exploded + typed."
+
+  - name: int_orders__totals_with_refund_net
+    description: "Order envelope with summed refund amount + computed net_revenue_vnd."
+
+  - name: int_orders__customer_joined
+    description: "Order joined to customer staging for sanity-check FK; small denorm."

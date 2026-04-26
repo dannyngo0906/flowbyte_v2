@@ -24,7 +24,7 @@ BEGIN
         'created_at', '2026-04-25T08:00:00Z', 'updated_at', '2026-04-25T10:00:00Z',
         'closed_at', null, 'cancelled_at', null,
         'line_items', jsonb_build_array(
-            jsonb_build_object('id', 9001, 'variant_id', 7001, 'quantity', 2, 'price', '250000')
+            jsonb_build_object('id', 9001, 'product_id', 3001, 'variant_id', 7001, 'quantity', 2, 'price', '250000')
         ),
         'refunds', jsonb_build_array(),
         'transactions', jsonb_build_array(
@@ -46,7 +46,7 @@ BEGIN
         'created_at', '2026-04-26T08:00:00Z', 'updated_at', '2026-04-26T12:00:00Z',
         'closed_at', null, 'cancelled_at', null,
         'line_items', jsonb_build_array(
-            jsonb_build_object('id', 9002, 'variant_id', 7001, 'quantity', 1, 'price', '300000')
+            jsonb_build_object('id', 9002, 'product_id', 3001, 'variant_id', 7001, 'quantity', 1, 'price', '300000')
         ),
         -- Refund with 1 nested transaction → exercises BOTH order_tx and refund_tx UNION branches.
         'refunds', jsonb_build_array(
