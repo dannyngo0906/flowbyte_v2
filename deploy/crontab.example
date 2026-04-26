@@ -1,5 +1,9 @@
 # Daily Haravan incremental sync at 02:00 (Asia/Ho_Chi_Minh)
-# Install: crontab -e, then paste this line; verify with `crontab -l`.
+# Install: crontab -e, then paste these lines; verify with `crontab -l`.
 # Logs go to /var/log/haravan-elt.log (rotate via logrotate).
+# Lockfile (fcntl.flock) prevents overlap; second invocation exits 2.
 
-0 2 * * * /opt/haravan-elt/scripts/run-daily.sh >> /var/log/haravan-elt.log 2>&1
+0 2 * * *   /opt/haravan-elt/scripts/run-daily.sh         >> /var/log/haravan-elt.log         2>&1
+
+# Monthly archive of meta.run_log → meta.run_log_archive (rows >90 days).
+0 3 1 * *   /opt/haravan-elt/scripts/cleanup-run-log.sh   >> /var/log/haravan-elt-cleanup.log 2>&1

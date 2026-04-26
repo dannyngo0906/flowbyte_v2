@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Cron entrypoint. Phase-10 wraps with fcntl.flock for overlap protection.
-# Until then, this is a thin wrapper around `haravan-elt run-all`.
+# Cron entrypoint for the daily Haravan ELT pipeline.
+#
+# Wraps `python -m haravan_elt.cron_entry`, which acquires an exclusive
+# fcntl lock and exits 2 if a prior run is still going. Activate the
+# project venv explicitly so cron's PATH doesn't matter.
 
 set -euo pipefail
 
@@ -10,4 +13,4 @@ cd "$PROJECT_DIR"
 # shellcheck disable=SC1091
 source .venv/bin/activate
 
-exec haravan-elt run-all --mode incremental
+exec python -m haravan_elt.cron_entry

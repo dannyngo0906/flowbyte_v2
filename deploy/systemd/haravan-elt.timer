@@ -1,0 +1,12 @@
+[Unit]
+Description=Haravan ELT daily timer
+
+[Timer]
+# Every day at 02:00 server local time.
+OnCalendar=*-*-* 02:00:00
+# Catch up if the host was off — runs once on next boot.
+Persistent=true
+Unit=haravan-elt.service
+
+[Install]
+WantedBy=timers.target

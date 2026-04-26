@@ -64,5 +64,5 @@ exclude = ["dbt/", "plans/", "docs/", "tests/fixtures/", "scripts/"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --cov=haravan_elt --cov-report=term-missing"
+addopts = "-q --cov=haravan_elt --cov-report=term-missing --cov-fail-under=70"
 filterwarnings = ["ignore::DeprecationWarning"]

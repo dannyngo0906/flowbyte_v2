@@ -1,0 +1,15 @@
+[Unit]
+Description=Haravan ELT daily run
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=elt
+WorkingDirectory=/opt/haravan-elt
+EnvironmentFile=/opt/haravan-elt/.env
+ExecStart=/opt/haravan-elt/scripts/run-daily.sh
+StandardOutput=journal
+StandardError=journal
+# Crashes / non-zero exits surface in `systemctl status` and journalctl;
+# do not Restart=on-failure (timer schedules the next run).

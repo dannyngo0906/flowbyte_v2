@@ -29,3 +29,8 @@ CREATE TABLE IF NOT EXISTS meta.run_log (
 );
 
 CREATE INDEX IF NOT EXISTS idx_run_log_started ON meta.run_log(started_at DESC);
+
+-- Cold storage for run_log rows older than the retention window. Populated
+-- by `scripts/archive-run-log.sql` (typically a monthly cron). Same columns
+-- as run_log so SELECT * UNION ALL works for forensic queries.
+CREATE TABLE IF NOT EXISTS meta.run_log_archive (LIKE meta.run_log INCLUDING ALL);
