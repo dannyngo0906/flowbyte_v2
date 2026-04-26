@@ -92,3 +92,31 @@ sources:
         columns:
           - name: id
             tests: [not_null, unique]
+
+      - name: discounts
+        identifier: haravan_discounts
+        freshness:
+          warn_after: { count: 24, period: hour }
+          error_after: { count: 72, period: hour }
+        columns:
+          - name: id
+            tests: [not_null, unique]
+
+      - name: promotions
+        identifier: haravan_promotions
+        freshness:
+          warn_after: { count: 24, period: hour }
+          error_after: { count: 72, period: hour }
+        columns:
+          - name: id
+            tests: [not_null, unique]
+
+      - name: events
+        identifier: haravan_events
+        # Audit log: events are dense throughout the day; tighter freshness.
+        freshness:
+          warn_after: { count: 12, period: hour }
+          error_after: { count: 48, period: hour }
+        columns:
+          - name: id
+            tests: [not_null, unique]

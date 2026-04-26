@@ -1,0 +1,12 @@
+version: 2
+
+seeds:
+  - name: vn_holidays
+    description: "VN public holidays 2020–2035; regen via scripts/generate-vn-holidays-seed.py."
+    columns:
+      - name: date
+        tests: [unique, not_null]
+      - name: holiday_name
+        tests: [not_null]
+      - name: is_public_holiday
+        tests: [not_null]

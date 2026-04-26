@@ -31,6 +31,11 @@ models:
 seeds:
   haravan_elt:
     +schema: marts
+    vn_holidays:
+      +column_types:
+        date: date
+        holiday_name: varchar(120)
+        is_public_holiday: boolean
 
 quoting:
   database: false

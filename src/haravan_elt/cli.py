@@ -46,14 +46,19 @@ def main(
 
 @app.command()
 def init() -> None:
-    """Apply schema.sql + raw_tables.sql against DATABASE_URL. Idempotent."""
+    """Apply schema.sql + raw_tables.sql + schema_p2.sql against DATABASE_URL.
+    Idempotent. schema_p2.sql is optional (phase-11 only); skipped if missing
+    so older deployments keep working."""
     settings = load_settings()
     dsn = settings.database.database_url.get_secret_value()
     schema_sql = _read_packaged("meta/schema.sql")
     raw_sql = _read_packaged("meta/raw_tables.sql")
+    p2_sql = _read_packaged_optional("meta/schema_p2.sql")
     with psycopg.connect(dsn) as conn, conn.cursor() as cur:
         cur.execute(schema_sql)
         cur.execute(raw_sql)
+        if p2_sql:
+            cur.execute(p2_sql)
     console.print("[green]✓[/green] schemas + meta + raw tables ready")
 
 
@@ -241,6 +246,14 @@ def _parse_iso_arg(name: str, value: str | None, default_tz: ZoneInfo) -> dateti
 
 def _read_packaged(relpath: str) -> str:
     return resources.files("haravan_elt").joinpath(relpath).read_text(encoding="utf-8")
+
+
+def _read_packaged_optional(relpath: str) -> str | None:
+    """Like `_read_packaged` but returns None if the resource is absent."""
+    res = resources.files("haravan_elt").joinpath(relpath)
+    if not res.is_file():
+        return None
+    return res.read_text(encoding="utf-8")
 
 
 # Avoid unused-import lint when Settings isn't referenced directly.

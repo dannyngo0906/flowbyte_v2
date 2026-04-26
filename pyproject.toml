@@ -30,6 +30,8 @@ dev = [
     "ruff>=0.4",
     "mypy>=1.10",
     "pre-commit>=3.7",
+    # Used by scripts/generate_vn_holidays_seed.py only — not a runtime dep.
+    "holidays>=0.50",
 ]
 
 [project.scripts]

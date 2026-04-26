@@ -47,6 +47,34 @@ class StateManager:
             conn.execute(sql, (domain, ts, run_id))
         logger.debug("watermark_updated", domain=domain, ts=ts.isoformat())
 
+    # ------------------------------------------------------------- high_id watermark
+    # Used by append-only event-style domains (phase-11 events) where the API
+    # paginates by `since_id` instead of `updated_at_min`.
+
+    def get_high_id(self, domain: str) -> int | None:
+        sql = "SELECT last_high_id FROM meta.sync_state WHERE domain = %s"
+        with psycopg.connect(self._dsn, row_factory=dict_row) as conn:
+            row = conn.execute(sql, (domain,)).fetchone()
+        if row is None or row["last_high_id"] is None:
+            return None
+        return int(row["last_high_id"])
+
+    def update_high_id(self, domain: str, high_id: int, run_id: UUID) -> None:
+        # last_updated_at is NOT NULL on the table — events have no native ts,
+        # so we stamp now() for that column. The semantic source of truth is
+        # last_high_id; last_updated_at acts as "row most recently touched".
+        sql = """
+            INSERT INTO meta.sync_state (domain, last_updated_at, last_high_id, last_run_id, updated_at)
+            VALUES (%s, now(), %s, %s, now())
+            ON CONFLICT (domain) DO UPDATE SET
+                last_high_id = GREATEST(coalesce(meta.sync_state.last_high_id, 0), EXCLUDED.last_high_id),
+                last_run_id = EXCLUDED.last_run_id,
+                updated_at = now()
+        """
+        with psycopg.connect(self._dsn) as conn:
+            conn.execute(sql, (domain, high_id, run_id))
+        logger.debug("high_id_updated", domain=domain, high_id=high_id)
+
     # --------------------------------------------------------------------- run_log
 
     def start_run(

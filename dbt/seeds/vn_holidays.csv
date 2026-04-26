@@ -1,0 +1,223 @@
+date,holiday_name,is_public_holiday
+2020-01-01,Tết Dương lịch,true
+2020-01-23,29 Tết,true
+2020-01-24,Giao thừa Tết Nguyên Đán,true
+2020-01-25,Tết Nguyên Đán,true
+2020-01-26,Mùng hai Tết Nguyên Đán,true
+2020-01-27,Mùng ba Tết Nguyên Đán,true
+2020-01-28,Mùng bốn Tết Nguyên Đán,true
+2020-01-29,Mùng năm Tết Nguyên Đán,true
+2020-04-02,Ngày Giỗ Tổ Hùng Vương,true
+2020-04-30,Ngày Chiến thắng,true
+2020-05-01,Ngày Quốc tế Lao động,true
+2020-09-02,Quốc khánh,true
+2021-01-01,Tết Dương lịch,true
+2021-02-10,29 Tết,true
+2021-02-11,Giao thừa Tết Nguyên Đán,true
+2021-02-12,Tết Nguyên Đán,true
+2021-02-13,Mùng hai Tết Nguyên Đán,true
+2021-02-14,Mùng ba Tết Nguyên Đán,true
+2021-02-15,Mùng bốn Tết Nguyên Đán,true
+2021-02-16,Mùng năm Tết Nguyên Đán,true
+2021-04-21,Ngày Giỗ Tổ Hùng Vương,true
+2021-04-30,Ngày Chiến thắng,true
+2021-05-01,Ngày Quốc tế Lao động,true
+2021-05-03,Ngày Quốc tế Lao động (nghỉ bù),true
+2021-09-02,Quốc khánh,true
+2021-09-03,Quốc khánh,true
+2022-01-01,Tết Dương lịch,true
+2022-01-03,Tết Dương lịch (nghỉ bù),true
+2022-01-31,Giao thừa Tết Nguyên Đán,true
+2022-02-01,Tết Nguyên Đán,true
+2022-02-02,Mùng hai Tết Nguyên Đán,true
+2022-02-03,Mùng ba Tết Nguyên Đán,true
+2022-02-04,Mùng bốn Tết Nguyên Đán,true
+2022-04-10,Ngày Giỗ Tổ Hùng Vương,true
+2022-04-11,Ngày Giỗ Tổ Hùng Vương (nghỉ bù),true
+2022-04-30,Ngày Chiến thắng,true
+2022-05-01,Ngày Quốc tế Lao động,true
+2022-05-02,Ngày Chiến thắng (nghỉ bù),true
+2022-05-03,Ngày Quốc tế Lao động (nghỉ bù),true
+2022-09-01,Quốc khánh,true
+2022-09-02,Quốc khánh,true
+2023-01-01,Tết Dương lịch,true
+2023-01-02,Tết Dương lịch (nghỉ bù),true
+2023-01-20,29 Tết,true
+2023-01-21,Giao thừa Tết Nguyên Đán,true
+2023-01-22,Tết Nguyên Đán,true
+2023-01-23,Mùng hai Tết Nguyên Đán,true
+2023-01-24,Mùng ba Tết Nguyên Đán,true
+2023-01-25,Mùng bốn Tết Nguyên Đán,true
+2023-01-26,Mùng năm Tết Nguyên Đán,true
+2023-04-29,Ngày Giỗ Tổ Hùng Vương,true
+2023-04-30,Ngày Chiến thắng,true
+2023-05-01,Ngày Quốc tế Lao động,true
+2023-05-02,Ngày Giỗ Tổ Hùng Vương (nghỉ bù),true
+2023-05-03,Ngày Chiến thắng (nghỉ bù),true
+2023-09-01,Quốc khánh,true
+2023-09-02,Quốc khánh,true
+2023-09-04,Quốc khánh (nghỉ bù),true
+2024-01-01,Tết Dương lịch,true
+2024-02-08,29 Tết,true
+2024-02-09,Giao thừa Tết Nguyên Đán,true
+2024-02-10,Tết Nguyên Đán,true
+2024-02-11,Mùng hai Tết Nguyên Đán,true
+2024-02-12,Mùng ba Tết Nguyên Đán,true
+2024-02-13,Mùng bốn Tết Nguyên Đán,true
+2024-02-14,Mùng năm Tết Nguyên Đán,true
+2024-04-18,Ngày Giỗ Tổ Hùng Vương,true
+2024-04-29,Ngày nghỉ (thay cho ngày 04/05/2024),true
+2024-04-30,Ngày Chiến thắng,true
+2024-05-01,Ngày Quốc tế Lao động,true
+2024-09-02,Quốc khánh,true
+2024-09-03,Quốc khánh,true
+2025-01-01,Tết Dương lịch,true
+2025-01-27,29 Tết,true
+2025-01-28,Giao thừa Tết Nguyên Đán,true
+2025-01-29,Tết Nguyên Đán,true
+2025-01-30,Mùng hai Tết Nguyên Đán,true
+2025-01-31,Mùng ba Tết Nguyên Đán,true
+2025-02-01,Mùng bốn Tết Nguyên Đán,true
+2025-04-07,Ngày Giỗ Tổ Hùng Vương,true
+2025-04-30,Ngày Chiến thắng,true
+2025-05-01,Ngày Quốc tế Lao động,true
+2025-09-01,Quốc khánh,true
+2025-09-02,Quốc khánh,true
+2026-01-01,Tết Dương lịch,true
+2026-02-16,Giao thừa Tết Nguyên Đán,true
+2026-02-17,Tết Nguyên Đán,true
+2026-02-18,Mùng hai Tết Nguyên Đán,true
+2026-02-19,Mùng ba Tết Nguyên Đán,true
+2026-02-20,Mùng bốn Tết Nguyên Đán,true
+2026-04-26,Ngày Giỗ Tổ Hùng Vương,true
+2026-04-27,Ngày Giỗ Tổ Hùng Vương (nghỉ bù),true
+2026-04-30,Ngày Chiến thắng,true
+2026-05-01,Ngày Quốc tế Lao động,true
+2026-09-01,Quốc khánh,true
+2026-09-02,Quốc khánh,true
+2027-01-01,Tết Dương lịch,true
+2027-02-04,29 Tết,true
+2027-02-05,Giao thừa Tết Nguyên Đán,true
+2027-02-06,Tết Nguyên Đán,true
+2027-02-07,Mùng hai Tết Nguyên Đán,true
+2027-02-08,Mùng ba Tết Nguyên Đán,true
+2027-02-09,Mùng bốn Tết Nguyên Đán,true
+2027-02-10,Mùng năm Tết Nguyên Đán,true
+2027-04-16,Ngày Giỗ Tổ Hùng Vương,true
+2027-04-30,Ngày Chiến thắng,true
+2027-05-01,Ngày Quốc tế Lao động,true
+2027-05-03,Ngày Quốc tế Lao động (nghỉ bù),true
+2027-09-02,Quốc khánh,true
+2027-09-03,Quốc khánh,true
+2028-01-01,Tết Dương lịch,true
+2028-01-03,Tết Dương lịch (nghỉ bù),true
+2028-01-24,29 Tết,true
+2028-01-25,Giao thừa Tết Nguyên Đán,true
+2028-01-26,Tết Nguyên Đán,true
+2028-01-27,Mùng hai Tết Nguyên Đán,true
+2028-01-28,Mùng ba Tết Nguyên Đán,true
+2028-01-29,Mùng bốn Tết Nguyên Đán,true
+2028-04-04,Ngày Giỗ Tổ Hùng Vương,true
+2028-04-30,Ngày Chiến thắng,true
+2028-05-01,Ngày Quốc tế Lao động,true
+2028-05-02,Ngày Chiến thắng (nghỉ bù),true
+2028-09-01,Quốc khánh,true
+2028-09-02,Quốc khánh,true
+2028-09-04,Quốc khánh (nghỉ bù),true
+2029-01-01,Tết Dương lịch,true
+2029-02-12,Giao thừa Tết Nguyên Đán,true
+2029-02-13,Tết Nguyên Đán,true
+2029-02-14,Mùng hai Tết Nguyên Đán,true
+2029-02-15,Mùng ba Tết Nguyên Đán,true
+2029-02-16,Mùng bốn Tết Nguyên Đán,true
+2029-04-23,Ngày Giỗ Tổ Hùng Vương,true
+2029-04-30,Ngày Chiến thắng,true
+2029-05-01,Ngày Quốc tế Lao động,true
+2029-09-02,Quốc khánh,true
+2029-09-03,Quốc khánh,true
+2029-09-04,Quốc khánh (nghỉ bù),true
+2030-01-01,Tết Dương lịch,true
+2030-01-31,29 Tết,true
+2030-02-01,Giao thừa Tết Nguyên Đán,true
+2030-02-02,Tết Nguyên Đán,true
+2030-02-03,Mùng hai Tết Nguyên Đán,true
+2030-02-04,Mùng ba Tết Nguyên Đán,true
+2030-02-05,Mùng bốn Tết Nguyên Đán,true
+2030-02-06,Mùng năm Tết Nguyên Đán,true
+2030-04-12,Ngày Giỗ Tổ Hùng Vương,true
+2030-04-30,Ngày Chiến thắng,true
+2030-05-01,Ngày Quốc tế Lao động,true
+2030-09-02,Quốc khánh,true
+2030-09-03,Quốc khánh,true
+2031-01-01,Tết Dương lịch,true
+2031-01-21,29 Tết,true
+2031-01-22,Giao thừa Tết Nguyên Đán,true
+2031-01-23,Tết Nguyên Đán,true
+2031-01-24,Mùng hai Tết Nguyên Đán,true
+2031-01-25,Mùng ba Tết Nguyên Đán,true
+2031-01-26,Mùng bốn Tết Nguyên Đán,true
+2031-01-27,Mùng năm Tết Nguyên Đán,true
+2031-04-01,Ngày Giỗ Tổ Hùng Vương,true
+2031-04-30,Ngày Chiến thắng,true
+2031-05-01,Ngày Quốc tế Lao động,true
+2031-09-01,Quốc khánh,true
+2031-09-02,Quốc khánh,true
+2032-01-01,Tết Dương lịch,true
+2032-02-09,29 Tết,true
+2032-02-10,Giao thừa Tết Nguyên Đán,true
+2032-02-11,Tết Nguyên Đán,true
+2032-02-12,Mùng hai Tết Nguyên Đán,true
+2032-02-13,Mùng ba Tết Nguyên Đán,true
+2032-02-14,Mùng bốn Tết Nguyên Đán,true
+2032-04-19,Ngày Giỗ Tổ Hùng Vương,true
+2032-04-30,Ngày Chiến thắng,true
+2032-05-01,Ngày Quốc tế Lao động,true
+2032-05-03,Ngày Quốc tế Lao động (nghỉ bù),true
+2032-09-02,Quốc khánh,true
+2032-09-03,Quốc khánh,true
+2033-01-01,Tết Dương lịch,true
+2033-01-03,Tết Dương lịch (nghỉ bù),true
+2033-01-30,Giao thừa Tết Nguyên Đán,true
+2033-01-31,Tết Nguyên Đán,true
+2033-02-01,Mùng hai Tết Nguyên Đán,true
+2033-02-02,Mùng ba Tết Nguyên Đán,true
+2033-02-03,Mùng bốn Tết Nguyên Đán,true
+2033-02-04,Mùng năm Tết Nguyên Đán,true
+2033-04-09,Ngày Giỗ Tổ Hùng Vương,true
+2033-04-11,Ngày Giỗ Tổ Hùng Vương (nghỉ bù),true
+2033-04-30,Ngày Chiến thắng,true
+2033-05-01,Ngày Quốc tế Lao động,true
+2033-05-02,Ngày Chiến thắng (nghỉ bù),true
+2033-05-03,Ngày Quốc tế Lao động (nghỉ bù),true
+2033-09-01,Quốc khánh,true
+2033-09-02,Quốc khánh,true
+2034-01-01,Tết Dương lịch,true
+2034-01-02,Tết Dương lịch (nghỉ bù),true
+2034-02-17,29 Tết,true
+2034-02-18,Giao thừa Tết Nguyên Đán,true
+2034-02-19,Tết Nguyên Đán,true
+2034-02-20,Mùng hai Tết Nguyên Đán,true
+2034-02-21,Mùng ba Tết Nguyên Đán,true
+2034-02-22,Mùng bốn Tết Nguyên Đán,true
+2034-02-23,Mùng năm Tết Nguyên Đán,true
+2034-04-28,Ngày Giỗ Tổ Hùng Vương,true
+2034-04-30,Ngày Chiến thắng,true
+2034-05-01,Ngày Quốc tế Lao động,true
+2034-05-02,Ngày Chiến thắng (nghỉ bù),true
+2034-09-01,Quốc khánh,true
+2034-09-02,Quốc khánh,true
+2034-09-04,Quốc khánh (nghỉ bù),true
+2035-01-01,Tết Dương lịch,true
+2035-02-06,29 Tết,true
+2035-02-07,Giao thừa Tết Nguyên Đán,true
+2035-02-08,Tết Nguyên Đán,true
+2035-02-09,Mùng hai Tết Nguyên Đán,true
+2035-02-10,Mùng ba Tết Nguyên Đán,true
+2035-02-11,Mùng bốn Tết Nguyên Đán,true
+2035-02-12,Mùng năm Tết Nguyên Đán,true
+2035-04-17,Ngày Giỗ Tổ Hùng Vương,true
+2035-04-30,Ngày Chiến thắng,true
+2035-05-01,Ngày Quốc tế Lao động,true
+2035-09-02,Quốc khánh,true
+2035-09-03,Quốc khánh,true
+2035-09-04,Quốc khánh (nghỉ bù),true

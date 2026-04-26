@@ -5,7 +5,7 @@ name: Haravan ELT Pipeline
 status: in-progress
 priority: P1
 effort: ~8 weeks
-progress: 10/12 phases (~83%)
+progress: 11/12 phases (~92%)
 branch: feat/haravan-elt
 date: 2026-04-26
 created: 2026-04-26
@@ -37,10 +37,10 @@ See [`docs/tech-stack.md`](../../docs/tech-stack.md) — Python 3.11, httpx, ten
 | 08 | Telegram notifications | M4 | ✅ completed | (this branch) | 2d |
 | 09 | P1 domains + validate | M5 | ✅ completed | (this branch) | 5d |
 | 10 | Hardening | M6 | ✅ completed | (this branch) | 5d |
-| 11 | Post-MVP domains | M7 | pending | — | 5d |
+| 11 | Post-MVP domains | M7 | ✅ completed | (this branch) | 5d |
 | 12 | CI (GitHub Actions) | M6 (parallel) | pending | — | 1d |
 
-**Progress:** 10 / 12 phases done. Verification: 121/121 pytest pass (89.85% coverage; coverage gate 70% enforced), dbt build 135/135 nodes, mypy clean. Lockfile + cron entry + systemd unit + run_log archive job + README rewrite shipped.
+**Progress:** 11 / 12 phases done. Verification: 130/130 pytest pass (90.49% coverage; gate 70% enforced), dbt build 156/156 nodes (11 raw tables, 14 staging views, 12 marts, 1 seed), mypy clean. P2 domains shipped (discounts/promotions/events with id-ascending pagination), VN holidays seeded into dim_date (Tết 2026 / 30-4 / 1-5 / 2-9 verified).
 
 **Deferred items (committed but not strictly checked off in phase todo lists):**
 - VCR cassette recording (phases 02/03/04) → used `respx` mocks; real cassettes need live Haravan token (phase-10 hardening)

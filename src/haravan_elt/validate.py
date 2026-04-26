@@ -32,6 +32,10 @@ DOMAIN_COUNT_ENDPOINT: dict[str, str] = {
     "inventory_adjustments": "/com/inventories/adjustments/count.json",
     "custom_collections": "/com/custom_collections/count.json",
     "smart_collections": "/com/smart_collections/count.json",
+    "discounts": "/com/discounts/count.json",
+    "promotions": "/com/promotions/count.json",
+    # `events` deliberately omitted — it has no /count endpoint; an
+    # append-only audit log is validated via id-monotonicity, not parity.
 }
 
 DOMAIN_RAW_TABLE: dict[str, str] = {
@@ -42,6 +46,8 @@ DOMAIN_RAW_TABLE: dict[str, str] = {
     "inventory_adjustments": "raw.haravan_inventory_adjustments",
     "custom_collections": "raw.haravan_custom_collections",
     "smart_collections": "raw.haravan_smart_collections",
+    "discounts": "raw.haravan_discounts",
+    "promotions": "raw.haravan_promotions",
 }
 
 

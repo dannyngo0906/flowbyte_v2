@@ -14,6 +14,7 @@ from typing import Any
 
 import structlog
 
+from haravan_elt.client.exceptions import HaravanAuthError
 from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.client.telegram import TelegramClient
 from haravan_elt.config import Settings
@@ -166,6 +167,14 @@ class Pipeline:
             return 0
         except Exception as exc:
             logger.error("run_all_failed", stage=stage, error=str(exc))
+            # Auth refresh failure is the operator's most urgent signal — emit
+            # a warning before the failure event so it shows even if the
+            # generic failure render obscures the auth context.
+            if isinstance(exc, HaravanAuthError):
+                notifier.warning(
+                    "Haravan token refresh failed",
+                    "Re-issue refresh token in the Haravan admin and update .env.",
+                )
             notifier.failure(stage=stage, exc=exc)
             return 1
 
