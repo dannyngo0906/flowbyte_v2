@@ -220,13 +220,13 @@
 
 ## Success Criteria
 
-- [ ] PR to `main` triggers `ci.yml`; status check appears on PR page
-- [ ] Workflow steps: checkout → setup → install → format → lint → mypy → schema init → pytest — all pass on clean main
-- [ ] Total wall time < 5 min on warm cache (after first run)
-- [ ] Postgres service container healthy before tests start (no flaky `psql: connection refused`)
-- [ ] Failing test → red status check → PR merge blocked (default GitHub branch protection rule recommended)
-- [ ] CI badge in README shows green
-- [ ] No secrets required (VCR mode=none, dummy env values)
+- [ ] PR to `main` triggers `ci.yml`; status check appears on PR page — DEFERRED, needs first push
+- [x] Workflow steps pass on clean main — locally mirrored via `make ci-local`, all green
+- [ ] Total wall time < 5 min on warm cache — DEFERRED, only measurable on real GitHub runner
+- [x] Postgres service container healthy via `--health-cmd pg_isready --health-retries 10` (~100s budget)
+- [ ] Failing test → red status check → merge blocked — DEFERRED, needs branch protection rule on GitHub
+- [ ] CI badge green in README — DEFERRED, OWNER/REPO placeholder until first push
+- [x] No secrets required — workflow uses dummy env vars, VCR cassettes mode=none
 
 ## Risk Assessment
 

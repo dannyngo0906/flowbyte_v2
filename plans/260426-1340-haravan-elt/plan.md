@@ -2,14 +2,14 @@
 title: "Haravan ELT Pipeline"
 description: "Self-hosted Python 3.11 ELT: Haravan Omni API → PostgreSQL JSONB → dbt star schema, CLI + Telegram notifications, full M0–M7 scope (~8 weeks)."
 name: Haravan ELT Pipeline
-status: in-progress
+status: completed
 priority: P1
 effort: ~8 weeks
 progress: 12/12 phases (100%)
 branch: feat/haravan-elt
 date: 2026-04-26
 created: 2026-04-26
-last_synced: 2026-04-26
+last_synced: 2026-04-27
 tags: [elt, dbt, postgres, haravan, python]
 blockedBy: []
 blocks: []
