@@ -16,6 +16,7 @@ import respx
 from haravan_elt.client.exceptions import (
     HaravanAuthError,
     HaravanServerError,
+    HaravanTransientError,
     HaravanValidationError,
 )
 from haravan_elt.client.haravan import HaravanClient
@@ -130,12 +131,40 @@ def test_500_persistent_raises_after_retry_budget(client: HaravanClient) -> None
 
 @respx.mock
 def test_400_validation_error_no_retry(client: HaravanClient) -> None:
+    """400/403/404 etc. are caller bugs — NOT retried, surface immediately."""
     route = respx.get("https://apis.haravan.com/com/orders.json").mock(
-        return_value=httpx.Response(422, json={"errors": "bad query"})
+        return_value=httpx.Response(400, json={"errors": "bad query"})
     )
     with pytest.raises(HaravanValidationError):
         client.get("/com/orders.json")
-    assert route.call_count == 1  # 4xx (non-401/429) is NOT retried
+    assert route.call_count == 1
+
+
+@respx.mock
+def test_422_then_200_succeeds_via_tenacity(client: HaravanClient) -> None:
+    """422 is treated as transient — verified live 2026-04-27 that the same
+    products page returned 422 once then 200 on subsequent attempts."""
+    route = respx.get("https://apis.haravan.com/com/orders.json").mock(
+        side_effect=[
+            httpx.Response(422, text="hiccup"),
+            httpx.Response(200, json={"orders": []}),
+        ]
+    )
+    with patch("haravan_elt.client.haravan.time.sleep"):
+        resp = client.get("/com/orders.json")
+    assert resp.status_code == 200
+    assert route.call_count == 2
+
+
+@respx.mock
+def test_422_persistent_raises_after_retry_budget(client: HaravanClient) -> None:
+    """If 422 truly persists across the retry budget, surface as transient
+    error (not validation error) so callers can distinguish."""
+    respx.get("https://apis.haravan.com/com/orders.json").mock(
+        return_value=httpx.Response(422, text="still 422")
+    )
+    with patch("haravan_elt.client.haravan.time.sleep"), pytest.raises(HaravanTransientError):
+        client.get("/com/orders.json")
 
 
 @respx.mock

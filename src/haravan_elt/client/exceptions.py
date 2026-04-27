@@ -36,7 +36,18 @@ class HaravanRateLimitError(HaravanAPIError):
 
 
 class HaravanValidationError(HaravanAPIError):
-    """4xx other than 401/429 — caller bug, NOT retryable."""
+    """4xx other than 401/422/429 — caller bug, NOT retryable.
+
+    Note: 422 is treated as transient (`HaravanTransientError`) because
+    Haravan returns 422 intermittently on valid pagination requests
+    (verified live 2026-04-27: same page 136 returned 422 once then 200
+    for 5 consecutive retries). Other 4xx (400, 403, 404, ...) bubble up
+    directly so true caller bugs surface immediately.
+    """
+
+
+class HaravanTransientError(HaravanAPIError):
+    """422 specifically — Haravan API hiccup that retry usually resolves."""
 
 
 class HaravanServerError(HaravanAPIError):

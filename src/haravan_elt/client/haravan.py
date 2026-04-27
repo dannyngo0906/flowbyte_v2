@@ -28,6 +28,7 @@ from haravan_elt.client.exceptions import (
     HaravanAuthError,
     HaravanRateLimitError,
     HaravanServerError,
+    HaravanTransientError,
     HaravanValidationError,
 )
 from haravan_elt.client.rate_limit import make_limiter
@@ -88,7 +89,12 @@ class HaravanClient:
         stop=stop_after_attempt(5),
         wait=wait_exponential(multiplier=2, min=1, max=30),
         retry=retry_if_exception_type(
-            (HaravanRateLimitError, HaravanServerError, httpx.TransportError)
+            (
+                HaravanRateLimitError,
+                HaravanServerError,
+                HaravanTransientError,
+                httpx.TransportError,
+            )
         ),
         reraise=True,
     )
@@ -136,6 +142,16 @@ class HaravanClient:
             raise HaravanServerError(
                 f"5xx {resp.status_code}", status=resp.status_code, body=resp.text
             )
+        if resp.status_code == 422:
+            # Haravan returns 422 intermittently on otherwise-valid requests
+            # (pagination edge cases). Tenacity retries via HaravanTransientError;
+            # if it persists 5 times the exception bubbles up unchanged.
+            logger.warning(
+                "haravan_422_transient",
+                path=path,
+                body_preview=resp.text[:200],
+            )
+            raise HaravanTransientError("422 transient", status=422, body=resp.text)
         if 400 <= resp.status_code < 500:
             raise HaravanValidationError(
                 f"4xx {resp.status_code}", status=resp.status_code, body=resp.text
