@@ -11,6 +11,9 @@ date: 2026-04-26
 created: 2026-04-26
 last_synced: 2026-04-27
 live_e2e_verified: 2026-04-27
+vps_deployed: 2026-04-27 # aiautomation2 (103.140.249.215), Postgres 16 + systemd timer 02:00 +07
+metabase_deployed: 2026-04-27 # Docker @ http://103.140.249.215:3000, read-only role metabase_reader
+full_extract_completed: 2026-04-27 # 277,587 customers / 76,292 orders / 7,362 products / 43,802 adjustments — events partial (7,548 / 236,158)
 tags: [elt, dbt, postgres, haravan, python]
 blockedBy: []
 blocks: []
@@ -63,6 +66,9 @@ See [`docs/tech-stack.md`](../../docs/tech-stack.md) — Python 3.11, httpx, ten
 | 5 | `extractors/inventory_adjustments.py:18` | `RESPONSE_KEY="inventory_adjustments"`, real API wrapper = `adjustments` | Silent 0 rows on every run | `RESPONSE_KEY="adjustments"` |
 | 6 | `dbt/.../stg_haravan__inventory_adjustments.sql` | flat shape, real API nests `line_items[]` array | Even with #5 fixed, 0 staging rows because top-level fields don't exist | Rewrite to explode `line_items[]`; line_item.id as PK |
 | 7 | `dbt/.../stg_haravan__order_transactions.sql` | UNION ALL of order.transactions[] + refunds[].transactions[] without dedupe | 78 transaction_ids appear in both arrays → unique constraint violation | `row_number() over (partition by id order by refund_id desc)` keeps refund-level row (richer metadata) |
+| 8 | `extractors/inventory_adjustments.py:33` | base `page_limit=250` but server caps `/com/inventories/adjustments.json` at 50/page | Same short-page short-circuit as orders/products — captured 50 of ~806 adjustments | Override `ADJUSTMENTS_PAGE_LIMIT=50` |
+| 9 | `extractors/events.py:23` | `DEFAULT_PAGE_LIMIT=250` but `/com/events.json` caps since_id pagination at 50/page | Captured 50 of 236,158 events lifetime | Lower to 50; full-events extract still impractical (28h at 4 req/s, deferred) |
+| 10 | `client/haravan.py:139` (status 422) | All 4xx mapped to non-retryable `HaravanValidationError` | Transient 422 (verified live: same products page returned 422 once then 200 on 5 retries) halted pipeline immediately | New `HaravanTransientError`; 422 added to tenacity retry-list (5 attempts × exp backoff 1-30s) |
 
 **Lesson:** live E2E catches what mocks miss. Fixtures #1, #5, #6, #7 were authored from PRD assumptions; fixtures #3, #4 used `page_limit=2` synthetic numbers that hid the real cap mismatch. Always probe a live endpoint before locking field names + caps in test fixtures.
 
@@ -71,8 +77,43 @@ See [`docs/tech-stack.md`](../../docs/tech-stack.md) — Python 3.11, httpx, ten
 - `tests/test_p0_extractors.py::test_products_default_page_limit_matches_haravan_cap` — same for products
 - `tests/test_inventory_extractors.py::test_inventory_locations_default_variant_batch_matches_haravan_cap` — asserts batch == 50
 - `tests/test_inventory_extractors.py::test_inventory_locations_to_raw_row_uses_composite_pk` — fixture uses `loc_id`
+- `tests/test_inventory_extractors.py::test_inventory_adjustments_default_page_limit_matches_haravan_cap` — asserts adjustments cap == 50
 - `tests/test_inventory_extractors.py` — adjustment fixtures use `"adjustments"` wrapper key
+- `tests/test_p2_extractors.py::test_events_default_page_limit_matches_haravan_cap` — events cap == 50
+- `tests/test_haravan_client.py::test_422_then_200_succeeds_via_tenacity` + `_persistent_raises_after_retry_budget` — 422 retry contract
 - `dbt/tests/orders_customer_id_resolution.sql` — singular test fails if >95% of orders have null customer_id
+
+**VPS production deployment (2026-04-27):**
+
+| Component | Detail |
+|-----------|--------|
+| Host | aiautomation2 @ 103.140.249.215 (Ubuntu 24.04, Postgres 16, Python 3.12) |
+| Pipeline | `/opt/haravan-elt/` cloned + venv + dbt-utils, owned by system user `elt` |
+| Schedule | systemd `haravan-elt.timer` daily 02:00 Asia/Ho_Chi_Minh |
+| Logs | `/var/log/haravan-elt.log`, `/var/log/haravan-elt-cleanup.log` + journald |
+| Telegram | bot 8776...334, chat 630545370 — alerts verified |
+| Metabase | Docker @ port 3000 (public), backend Postgres `metabase_app`, read-only role `metabase_reader` for analytics DB |
+
+**Full historical extract results on VPS:**
+
+| Domain | Rows | Note |
+|--------|-----:|------|
+| customers | 277,587 | Full lifetime |
+| products | 7,362 | Full lifetime |
+| orders | 76,292 | Full lifetime |
+| order_lines (mart) | 203,903 | Exploded |
+| transactions (mart) | 152,357 | Deduped (bug #7) |
+| refunds (mart) | 2,033 | |
+| inventory_locations | 42,632 | All 9 locations × variants |
+| inventory_adjustments | 43,802 (mart, line-item grain) | 806 raw adjustments × N line_items |
+| custom_collections | 328 | |
+| smart_collections | 226 | |
+| discounts | 528 | |
+| promotions | 4,882 | |
+| events | 7,548 / 236,158 (3.2%) | Skipped historical — daily cron picks up new events |
+
+**dbt build (full-refresh, with full data): 152 PASS / 1 WARN / 4 ERROR**
+- 4 errors are real-world data conditions: archived/deleted products break referential FKs from older orders/adjustments. Not code bugs. Optional follow-up: switch `relationships` test severity to `warn` or add sentinel "deleted" rows in dim tables.
 
 **30-day run results (2026-03-28 → 2026-04-27):**
 - 11 extractors clean: locations(9), customers(6,053), products(5,082), custom_collections(7), smart_collections(1), orders(7,580), inventory_adjustments(0 — empty for window), inventory_locations(16,155 — 1/9 locations, partial by user choice), discounts(45), promotions(511), events(51)

@@ -269,8 +269,8 @@ systemd unit (alternative to cron):
 - [x] Rewrite `README.md` zero-to-first-run guide (replaced boilerplate)
 - [x] Write `test_lockfile.py` (4 cases) + `test_cron_entry.py` (4 cases)
 - [x] Run full test suite — 121/121 pass, coverage 89.85% (gate 70% reached)
-- [ ] 7-day cron stability soak (manual on dev VPS) — DEFERRED, needs VPS + live token
-- [ ] Verify daily incremental run completes < 10 min on dev shop — DEFERRED, needs live shop
+- [ ] 7-day cron stability soak (manual on dev VPS) — IN PROGRESS 2026-04-27: VPS aiautomation2 (103.140.249.215) deployed Ubuntu 24.04 + Postgres 16, systemd timer enabled (next 02:00 +07). Day 0/7 monitoring.
+- [x] Verify daily incremental run completes < 10 min on dev shop — VERIFIED 2026-04-27: full-mode initial backfill ran orders (76k) in ~15 min, customers (277k) in ~8 min via VPS network. Subsequent incremental runs sub-minute on watermark.
 
 ## Success Criteria
 

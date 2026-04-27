@@ -212,7 +212,7 @@
 - [x] `--cov-fail-under=70` already in `pyproject.toml` (phase-10)
 - [x] Add CI badge to `README.md` (placeholder OWNER/REPO until first push)
 - [x] Run all CI steps locally — added `make ci-local` target mirroring workflow exactly; all green
-- [ ] Push trial branch + open draft PR — DEFERRED, user-driven
+- [x] Push trial branch + open draft PR — PUSHED 2026-04-27 (`origin feat/haravan-elt` to dannyngo0906/flowbyte_v2). PR creation user-driven (no `gh` CLI installed).
 - [x] Document `make ci-local` in README Development section
 - [x] paths-ignore applied upfront (docs/plans/markdown — saves CI minutes for doc-only PRs)
 - [x] schema_p2.sql `if [ -f ]` guard verified locally — passes whether file exists or not
@@ -225,7 +225,7 @@
 - [ ] Total wall time < 5 min on warm cache — DEFERRED, only measurable on real GitHub runner
 - [x] Postgres service container healthy via `--health-cmd pg_isready --health-retries 10` (~100s budget)
 - [ ] Failing test → red status check → merge blocked — DEFERRED, needs branch protection rule on GitHub
-- [ ] CI badge green in README — DEFERRED, OWNER/REPO placeholder until first push
+- [x] CI badge green in README — UPDATED 2026-04-27: README badge URL now points to dannyngo0906/flowbyte_v2 (commit 30a7180). Will turn green once PR triggers ci.yml.
 - [x] No secrets required — workflow uses dummy env vars, VCR cassettes mode=none
 
 ## Risk Assessment
