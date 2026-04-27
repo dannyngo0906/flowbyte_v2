@@ -19,7 +19,7 @@ from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.config import Settings
 from haravan_elt.extractors.base import PaginatedListExtractor
 from haravan_elt.extractors.discounts import DiscountsExtractor
-from haravan_elt.extractors.events import EventsExtractor
+from haravan_elt.extractors.events import DEFAULT_PAGE_LIMIT, EventsExtractor
 from haravan_elt.extractors.promotions import PromotionsExtractor
 
 
@@ -87,6 +87,15 @@ def _build_events(page_limit: int = 2, last_high_id: int | None = None) -> Event
     state.get_high_id = MagicMock(return_value=last_high_id)
     state.update_high_id = MagicMock()
     return EventsExtractor(client, loader, state, uuid4(), page_limit=page_limit)
+
+
+def test_events_default_page_limit_matches_haravan_cap(fake_settings_env: None) -> None:
+    """Regression: Haravan caps `/com/events.json` at 50 rows per request,
+    same as orders/products/inventory_adjustments. Verified live 2026-04-27."""
+    del fake_settings_env
+    ext = EventsExtractor(HaravanClient(Settings()), MagicMock(), MagicMock(), uuid4())
+    assert DEFAULT_PAGE_LIMIT == 50
+    assert ext._limit == 50
 
 
 def _event(id_: int) -> dict[str, Any]:

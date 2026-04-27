@@ -20,7 +20,11 @@ from haravan_elt.extractors.base import BaseExtractor
 
 logger = structlog.get_logger(__name__)
 
-DEFAULT_PAGE_LIMIT = 250
+# Live API caps `/com/events.json` at 50 rows per request regardless of the
+# requested limit (verified 2026-04-27 — same pattern as orders/products/
+# inventory_adjustments). Setting limit=250 + the short-page check (`len <
+# limit`) terminates after page 1 with only 50 events captured.
+DEFAULT_PAGE_LIMIT = 50
 
 
 class EventsExtractor(BaseExtractor):
