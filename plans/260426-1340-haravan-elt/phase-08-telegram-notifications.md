@@ -212,8 +212,8 @@ HaravanClient.rate_limit_counter (new attribute):
 - [x] Implement `parse_run_results` helper in `dbt_runner.py`
 - [x] Record VCR cassettes (telegram 200, 500) — hand-crafted; replayed via `vcr.use_cassette()` to keep plan-specified filenames
 - [x] Write tests: `test_telegram_client.py` (12 cases incl. retry/escape/VCR) and `test_notifications.py` (12 cases)
-- [ ] Manual end-to-end: trigger pipeline with `--triggered-by cron --no-notify=false` and verify start + success messages arrive in test channel — DEFERRED, needs live `TELEGRAM_BOT_TOKEN`
-- [ ] Verify failure path: induce error in extract → failure message arrives — DEFERRED, needs live channel
+- [x] Manual end-to-end: trigger pipeline with `--triggered-by cron --no-notify=false` and verify start + success messages arrive in test channel — VERIFIED 2026-04-27 (live `TELEGRAM_BOT_TOKEN=8776...334`, chat_id=630545370; HTTP 200 OK on `notify`, `run_start cron`, `run_failure` sends)
+- [x] Verify failure path: induce error in extract → failure message arrives — VERIFIED 2026-04-27 (`inventory_locations` KeyError → failure message delivered before fix; later `dbt_build` test failures → second failure message delivered)
 
 ## Success Criteria
 

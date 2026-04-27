@@ -311,7 +311,7 @@ CREATE INDEX IF NOT EXISTS idx_haravan_orders_updated ON raw.haravan_orders(upda
 - [x] Extend `cli.py` `extract` subcommand wiring (run_id, contextvars, exit codes)
 - [ ] Record VCR cassettes (3-page full + empty incremental)  <!-- DEFERRED: respx mocks used; phase-10 cassette pass -->
 - [x] Write `test_orders_extractor.py`, `test_postgres_loader.py`, `test_state.py`
-- [ ] Verify idempotency manually: live-token run gated to phase-10  <!-- DEFERRED: integration tests cover contract; live run pending token -->
+- [x] Verify idempotency manually: live-token run gated to phase-10  <!-- VERIFIED 2026-04-27: re-ran orders extract on same range → 50 rows unchanged (ON CONFLICT preserves) -->
 - [x] Verify watermark advance: incremental run after full → 0 rows ingested if no API changes
 
 ## Success Criteria

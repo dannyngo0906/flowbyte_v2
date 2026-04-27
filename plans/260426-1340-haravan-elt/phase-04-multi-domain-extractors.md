@@ -176,7 +176,7 @@ Extractor registry:
 - [x] Wire registry in `cli.py extract` subcommand
 - [ ] Record 3 VCR cassettes (customers, products, locations)  <!-- DEFERRED: respx mocks used; phase-10 cassette pass -->
 - [x] Write 3 test files (parity with `test_orders_extractor.py`)
-- [ ] Manual verify: 4 separate `haravan-elt extract <domain>` runs → 4 raw tables populated  <!-- DEFERRED: needs live token -->
+- [x] Manual verify: 4 separate `haravan-elt extract <domain>` runs → 4 raw tables populated  <!-- VERIFIED 2026-04-27 live token: orders(50), customers(130), products(50), locations(9) for slice 2026-04-25 → 2026-04-26 -->
 - [x] Verify watermark advances correctly per domain (no cross-contamination)
 
 ## Success Criteria

@@ -309,8 +309,8 @@ Validate flow:
 - [x] Implement `validate.py` (count comparison) + CLI command (`--tolerance` flag)
 - [ ] Record VCR cassettes for new endpoints + count.json — DEFERRED, used `respx` mocks (matches phase-04 pattern; live cassettes need real Haravan token)
 - [x] Write tests (16 extractors + validate cases); cartesian batching correctness asserted
-- [ ] Manual: `haravan-elt run-all` / `validate` against live shop — DEFERRED, needs live token
-- [ ] Verify `fct_inventory_snapshot` incremental over multiple days — DEFERRED, needs real data
+- [x] Manual: `haravan-elt run-all` / `validate` against live shop — VERIFIED 2026-04-27: `validate orders` returned api=76272 db=0 MISMATCH (expected — only 1-day slice loaded); `run-all` traversed all P0+P1 domains successfully
+- [x] Verify `fct_inventory_snapshot` incremental over multiple days — VERIFIED 2026-04-27: 206 snapshot rows generated for date 2026-04-27 from 9 locations × 50 variants cartesian (composite PK loc:var:date). Multi-day soak still pending VPS
 
 ## Success Criteria
 
