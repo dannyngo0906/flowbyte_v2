@@ -18,7 +18,10 @@ import respx
 
 from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.config import Settings
-from haravan_elt.extractors.inventory_adjustments import InventoryAdjustmentsExtractor
+from haravan_elt.extractors.inventory_adjustments import (
+    ADJUSTMENTS_PAGE_LIMIT,
+    InventoryAdjustmentsExtractor,
+)
 from haravan_elt.extractors.inventory_locations import (
     DEFAULT_VARIANT_BATCH,
     InventoryLocationsExtractor,
@@ -204,6 +207,21 @@ def test_inventory_locations_default_variant_batch_matches_haravan_cap() -> None
     """Regression: Haravan caps variant_ids at 50 per request — verified live
     via 422 response 'Tối đa chỉ được 50 biến thể' once batch >50."""
     assert DEFAULT_VARIANT_BATCH == 50
+
+
+def test_inventory_adjustments_default_page_limit_matches_haravan_cap(
+    fake_settings_env: None,
+) -> None:
+    """Regression: Haravan caps `/com/inventories/adjustments.json` at 50 rows
+    per page server-side, same as orders/products. Verified live 2026-04-27."""
+    del fake_settings_env
+    # Build directly so we exercise the production default, not the
+    # test-helper override (`_make_adjustments_extractor` injects page_limit=2).
+    ext = InventoryAdjustmentsExtractor(
+        HaravanClient(Settings()), MagicMock(), MagicMock(), uuid4()
+    )
+    assert ADJUSTMENTS_PAGE_LIMIT == 50
+    assert ext._limit == 50
 
 
 @respx.mock
