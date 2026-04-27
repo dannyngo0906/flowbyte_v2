@@ -12,7 +12,7 @@ import respx
 
 from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.config import Settings
-from haravan_elt.extractors.orders import OrdersExtractor
+from haravan_elt.extractors.orders import ORDERS_PAGE_LIMIT, OrdersExtractor
 
 
 def _make_extractor(page_limit: int = 50) -> tuple[OrdersExtractor, MagicMock, MagicMock]:
@@ -28,6 +28,18 @@ def _make_extractor(page_limit: int = 50) -> tuple[OrdersExtractor, MagicMock, M
 
 def _order(id_: int, updated_at: str = "2026-04-25T10:00:00Z") -> dict[str, Any]:
     return {"id": id_, "updated_at": updated_at, "name": f"#{id_}"}
+
+
+def test_orders_default_page_limit_matches_haravan_cap(fake_settings_env: None) -> None:
+    """Regression: Haravan caps `/com/orders.json` at 50/page server-side. If
+    we ever bump default back to 250, the base-class short-page check will
+    terminate after page 1 (`50 < 250`)."""
+    del fake_settings_env
+    settings = Settings()
+    client = HaravanClient(settings)
+    ext = OrdersExtractor(client, MagicMock(), MagicMock(), uuid4())
+    assert ORDERS_PAGE_LIMIT == 50
+    assert ext._limit == 50
 
 
 @respx.mock

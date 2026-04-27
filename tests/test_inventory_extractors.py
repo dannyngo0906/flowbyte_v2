@@ -44,7 +44,7 @@ def test_inventory_adjustments_paginates_until_short_page(fake_settings_env: Non
         return_value=httpx.Response(
             200,
             json={
-                "inventory_adjustments": [
+                "adjustments": [
                     {"id": 1, "updated_at": "2026-04-25T10:00:00Z", "variant_id": 11},
                     {"id": 2, "updated_at": "2026-04-25T10:05:00Z", "variant_id": 12},
                 ]
@@ -55,7 +55,7 @@ def test_inventory_adjustments_paginates_until_short_page(fake_settings_env: Non
         return_value=httpx.Response(
             200,
             json={
-                "inventory_adjustments": [
+                "adjustments": [
                     {"id": 3, "updated_at": "2026-04-25T10:10:00Z", "variant_id": 13}
                 ]
             },
@@ -74,7 +74,7 @@ def test_inventory_adjustments_idempotent_load(fake_settings_env: None) -> None:
         return_value=httpx.Response(
             200,
             json={
-                "inventory_adjustments": [
+                "adjustments": [
                     {"id": 7, "updated_at": "2026-04-25T10:00:00Z", "variant_id": 11}
                 ]
             },
@@ -116,11 +116,14 @@ def _build_inventory_locations(
 
 
 def _inventory_payload(loc_id: int, variant_ids: list[int]) -> dict[str, Any]:
-    """Mimic the API: one inventory_locations entry per (loc, variant)."""
+    """Mimic the API: one inventory_locations entry per (loc, variant).
+
+    Real API uses `loc_id` (verified against live shop), not `location_id`.
+    """
     return {
         "inventory_locations": [
             {
-                "location_id": loc_id,
+                "loc_id": loc_id,
                 "variant_id": v,
                 "available": 5,
                 "on_hand": 7,
@@ -147,7 +150,7 @@ def test_inventory_locations_walks_full_cartesian(fake_settings_env: None) -> No
 
     pages = list(ext.iter_pages())
     flat = [item for p in pages for item in p]
-    pairs = {(it["location_id"], it["variant_id"]) for it in flat}
+    pairs = {(it["loc_id"], it["variant_id"]) for it in flat}
     assert pairs == {(101, 1), (101, 2), (101, 3), (102, 1), (102, 2), (102, 3)}
 
 
@@ -183,16 +186,24 @@ def test_inventory_locations_skipped_when_grid_empty(fake_settings_env: None) ->
 
 
 def test_inventory_locations_to_raw_row_uses_composite_pk(fake_settings_env: None) -> None:
+    """Regression: Haravan returns `loc_id` (not `location_id`) on
+    inventory_locations rows. Verified live 2026-04-27."""
     del fake_settings_env
     ext = _build_inventory_locations([101], [11])
     snap = ext._snapshot_date.isoformat()
-    item = {"location_id": 101, "variant_id": 11, "available": 4, "on_hand": 6}
+    item = {"loc_id": 101, "variant_id": 11, "available": 4, "on_hand": 6}
     row = ext.to_raw_row(item)
     assert row["id"] == f"101:11:{snap}"
     assert row["location_id"] == 101
     assert row["variant_id"] == 11
     assert row["snapshot_date"] == ext._snapshot_date
     assert row["payload"].obj == item
+
+
+def test_inventory_locations_default_variant_batch_matches_haravan_cap() -> None:
+    """Regression: Haravan caps variant_ids at 50 per request — verified live
+    via 422 response 'Tối đa chỉ được 50 biến thể' once batch >50."""
+    assert DEFAULT_VARIANT_BATCH == 50
 
 
 @respx.mock

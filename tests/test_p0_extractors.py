@@ -20,7 +20,7 @@ from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.config import Settings
 from haravan_elt.extractors.base import PaginatedListExtractor
 from haravan_elt.extractors.customers import CustomersExtractor
-from haravan_elt.extractors.products import ProductsExtractor
+from haravan_elt.extractors.products import PRODUCTS_PAGE_LIMIT, ProductsExtractor
 
 
 def _build(
@@ -32,6 +32,14 @@ def _build(
     state.get_watermark = MagicMock(return_value=None)
     extractor = cls(client, loader, state, uuid4(), page_limit=page_limit)
     return extractor, loader
+
+
+def test_products_default_page_limit_matches_haravan_cap(fake_settings_env: None) -> None:
+    """Regression: Haravan caps `/com/products.json` at 50/page server-side."""
+    del fake_settings_env
+    ext = ProductsExtractor(HaravanClient(Settings()), MagicMock(), MagicMock(), uuid4())
+    assert PRODUCTS_PAGE_LIMIT == 50
+    assert ext._limit == 50
 
 
 def _item(id_: int, updated_at: str = "2026-04-25T10:00:00Z") -> dict[str, Any]:
