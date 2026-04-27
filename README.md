@@ -1,8 +1,6 @@
 # haravan-elt
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
-
-> Replace `OWNER/REPO` in the badge URL above after pushing to GitHub.
+[![CI](https://github.com/dannyngo0906/flowbyte_v2/actions/workflows/ci.yml/badge.svg)](https://github.com/dannyngo0906/flowbyte_v2/actions/workflows/ci.yml)
 
 Self-hosted ELT pipeline for Haravan: Omni API → PostgreSQL JSONB → dbt star schema.
 Single Python 3.11 process, idempotent re-runs, cron-driven daily incremental,
