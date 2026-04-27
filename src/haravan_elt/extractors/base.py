@@ -141,6 +141,11 @@ class PaginatedListExtractor(BaseExtractor):
                 return
             yield items
             # EOF: short page (research §2 — Haravan has no Link header / total).
+            # Subclasses MUST set page_limit to match the API's actual per-page
+            # cap. Some endpoints (orders, products) cap at 50 server-side
+            # regardless of the requested limit; setting page_limit=250 there
+            # would terminate after page 1 because 50 < 250. See orders.py /
+            # products.py for endpoint-specific overrides.
             if len(items) < self._limit:
                 return
             page += 1

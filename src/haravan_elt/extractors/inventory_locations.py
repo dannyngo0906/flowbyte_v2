@@ -29,9 +29,10 @@ from haravan_elt.extractors.base import BaseExtractor
 
 logger = structlog.get_logger(__name__)
 
-# Haravan accepts a comma-separated `variant_ids` list. 100 keeps URL length
-# safely under common 8KB limits while staying within their ~250 page budget.
-DEFAULT_VARIANT_BATCH = 100
+# Haravan caps `variant_ids` at 50 per request — verified live (422
+# "Tối đa chỉ được 50 biến thể" once batch exceeds 50). URL length not the
+# binding constraint; the server-side limit is.
+DEFAULT_VARIANT_BATCH = 50
 
 
 class InventoryLocationsExtractor(BaseExtractor):
@@ -82,7 +83,8 @@ class InventoryLocationsExtractor(BaseExtractor):
                     yield items
 
     def to_raw_row(self, item: dict[str, Any]) -> dict[str, Any]:
-        loc_id = item["location_id"]
+        # Haravan API returns `loc_id`, not `location_id`.
+        loc_id = item["loc_id"]
         var_id = item["variant_id"]
         snap = self._snapshot_date
         return {
