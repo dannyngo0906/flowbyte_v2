@@ -4,7 +4,13 @@ select
     (payload->>'id')::bigint                          as order_id,
     payload->>'name'                                  as order_name,
     payload->>'order_number'                          as order_number,
-    nullif(payload->>'customer_id', '')::bigint       as customer_id,
+    -- Haravan nests customer info under `payload.customer.id`, not a top-level
+    -- `customer_id` field (verified live 2026-04-27 against boshop-8). Fall back
+    -- to top-level for safety in case API ever flattens it.
+    coalesce(
+        nullif(payload->'customer'->>'id', '')::bigint,
+        nullif(payload->>'customer_id', '')::bigint
+    ) as customer_id,
     nullif(payload->>'location_id', '')::bigint       as location_id,
     payload->>'currency'                              as currency,
     payload->>'financial_status'                      as financial_status,
