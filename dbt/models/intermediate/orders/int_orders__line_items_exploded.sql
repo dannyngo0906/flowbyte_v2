@@ -20,8 +20,13 @@ select
     nullif(li->>'product_id', '')::bigint                     as product_id,
     nullif(li->>'quantity', '')::int                          as quantity,
     nullif(li->>'price', '')::numeric(18,2)                   as unit_price_vnd,
+    -- price_original = original list price before member/promo discounts (matches Haravan admin "Doanh thu")
+    coalesce(nullif(li->>'price_original', '')::numeric(18,2),
+             nullif(li->>'price', '')::numeric(18,2))         as unit_price_original_vnd,
     nullif(li->>'total_discount', '')::numeric(18,2)          as line_discount_vnd,
-    coalesce(nullif(li->>'price', '')::numeric(18,2), 0)
+    -- line_total_vnd uses price_original to match Haravan admin "Doanh thu" (gross before promo discounts)
+    coalesce(nullif(li->>'price_original', '')::numeric(18,2),
+             nullif(li->>'price', '')::numeric(18,2), 0)
         * coalesce(nullif(li->>'quantity', '')::int, 0)        as line_total_vnd
 from exploded
 where li->>'id' is not null

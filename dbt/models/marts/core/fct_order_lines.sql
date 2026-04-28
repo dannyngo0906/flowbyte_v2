@@ -17,6 +17,7 @@ select
     product_id,
     quantity,
     unit_price_vnd,
+    unit_price_original_vnd,
     line_discount_vnd,
     line_total_vnd,
     created_at
