@@ -31,11 +31,20 @@ models:
 seeds:
   haravan_elt:
     +schema: marts
+    dssp_ton_kho_thang4:
+      +column_types:
+        stt: integer
+        sku: varchar(50)
+        ten_san_pham: varchar(500)
     vn_holidays:
       +column_types:
         date: date
         holiday_name: varchar(120)
         is_public_holiday: boolean
+
+on-run-end:
+  - "GRANT USAGE ON SCHEMA staging_marts TO metabase_reader"
+  - "GRANT SELECT ON ALL TABLES IN SCHEMA staging_marts TO metabase_reader"
 
 quoting:
   database: false
