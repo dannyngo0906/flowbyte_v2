@@ -78,20 +78,20 @@ def test_run_log_truncates_long_error(pg_clean: str) -> None:
 
 def test_high_id_starts_none(pg_clean: str) -> None:
     state = StateManager(pg_clean)
-    assert state.get_high_id("events") is None
+    assert state.get_high_id("promotions") is None
 
 
 def test_high_id_set_and_read(pg_clean: str) -> None:
     state = StateManager(pg_clean)
-    state.update_high_id("events", 12345, uuid4())
-    assert state.get_high_id("events") == 12345
+    state.update_high_id("promotions", 12345, uuid4())
+    assert state.get_high_id("promotions") == 12345
 
 
 def test_high_id_greatest_prevents_regression(pg_clean: str) -> None:
     state = StateManager(pg_clean)
-    state.update_high_id("events", 200, uuid4())
-    state.update_high_id("events", 100, uuid4())  # stale
-    assert state.get_high_id("events") == 200
+    state.update_high_id("promotions", 200, uuid4())
+    state.update_high_id("promotions", 100, uuid4())  # stale
+    assert state.get_high_id("promotions") == 200
 
 
 def test_latest_runs_orders_descending(pg_clean: str) -> None:

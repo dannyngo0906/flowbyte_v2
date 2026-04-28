@@ -3,8 +3,7 @@
 Used by `cli.py extract` and the `run-all` orchestrator. Order matters
 because dbt marts will join on FKs: locations + customers + products must
 land before orders so dim references resolve cleanly. P2 domains
-(discounts, promotions, events) come last — events specifically needs
-locations/products already populated for any future correlation work.
+(discounts, promotions) come last.
 """
 
 from __future__ import annotations
@@ -13,7 +12,6 @@ from haravan_elt.extractors.base import BaseExtractor
 from haravan_elt.extractors.custom_collections import CustomCollectionsExtractor
 from haravan_elt.extractors.customers import CustomersExtractor
 from haravan_elt.extractors.discounts import DiscountsExtractor
-from haravan_elt.extractors.events import EventsExtractor
 from haravan_elt.extractors.inventory_adjustments import InventoryAdjustmentsExtractor
 from haravan_elt.extractors.inventory_locations import InventoryLocationsExtractor
 from haravan_elt.extractors.locations import LocationsExtractor
@@ -33,7 +31,6 @@ EXTRACTORS: dict[str, type[BaseExtractor]] = {
     "inventory_locations": InventoryLocationsExtractor,
     "discounts": DiscountsExtractor,
     "promotions": PromotionsExtractor,
-    "events": EventsExtractor,
 }
 
 # Canonical run order: dims → P0/P1 facts → snapshot-cartesian → P2 domains.
@@ -48,5 +45,4 @@ DOMAIN_ORDER: list[str] = [
     "inventory_locations",
     "discounts",
     "promotions",
-    "events",
 ]

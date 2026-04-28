@@ -113,11 +113,3 @@ models:
     columns:
       - name: promotion_id
         tests: [unique, not_null]
-
-  - name: stg_haravan__events
-    description: "Append-only audit log; one row per event."
-    columns:
-      - name: event_id
-        tests: [unique, not_null]
-      - name: event_created_at
-        tests: [not_null]

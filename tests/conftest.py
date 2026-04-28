@@ -89,7 +89,7 @@ def pg_clean(pg_dsn: str) -> Iterator[str]:
         "raw.haravan_locations, raw.haravan_inventory_adjustments, "
         "raw.haravan_inventory_locations, raw.haravan_custom_collections, "
         "raw.haravan_smart_collections, raw.haravan_discounts, "
-        "raw.haravan_promotions, raw.haravan_events, "
+        "raw.haravan_promotions, "
         "meta.sync_state, meta.run_log "
         "RESTART IDENTITY CASCADE"
     )

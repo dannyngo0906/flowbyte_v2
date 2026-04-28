@@ -34,8 +34,6 @@ DOMAIN_COUNT_ENDPOINT: dict[str, str] = {
     "smart_collections": "/com/smart_collections/count.json",
     "discounts": "/com/discounts/count.json",
     "promotions": "/com/promotions/count.json",
-    # `events` deliberately omitted — it has no /count endpoint; an
-    # append-only audit log is validated via id-monotonicity, not parity.
 }
 
 DOMAIN_RAW_TABLE: dict[str, str] = {
