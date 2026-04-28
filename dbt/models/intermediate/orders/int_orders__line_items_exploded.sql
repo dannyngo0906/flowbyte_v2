@@ -24,9 +24,8 @@ select
     coalesce(nullif(li->>'price_original', '')::numeric(18,2),
              nullif(li->>'price', '')::numeric(18,2))         as unit_price_original_vnd,
     nullif(li->>'total_discount', '')::numeric(18,2)          as line_discount_vnd,
-    -- line_total_vnd uses price_original to match Haravan admin "Doanh thu" (gross before promo discounts)
-    coalesce(nullif(li->>'price_original', '')::numeric(18,2),
-             nullif(li->>'price', '')::numeric(18,2), 0)
+    -- line_total_vnd = actual selling price × qty (giá bán thực, không tính hàng tặng kèm/promo)
+    coalesce(nullif(li->>'price', '')::numeric(18,2), 0)
         * coalesce(nullif(li->>'quantity', '')::int, 0)        as line_total_vnd
 from exploded
 where li->>'id' is not null
