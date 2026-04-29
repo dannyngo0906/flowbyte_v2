@@ -43,8 +43,14 @@ seeds:
         is_public_holiday: boolean
 
 on-run-end:
-  - "GRANT USAGE ON SCHEMA staging_marts TO metabase_reader"
-  - "GRANT SELECT ON ALL TABLES IN SCHEMA staging_marts TO metabase_reader"
+  # Grant Metabase reader access to all analytics schemas. raw is granted
+  # separately (manual one-time) since it's not managed by dbt.
+  - "{% for s in ['staging_marts', 'staging_staging', 'staging', 'intermediate', 'marts', 'meta'] %}
+       GRANT USAGE ON SCHEMA {{ s }} TO metabase_reader;
+       GRANT SELECT ON ALL TABLES IN SCHEMA {{ s }} TO metabase_reader;
+       ALTER DEFAULT PRIVILEGES FOR ROLE elt_user IN SCHEMA {{ s }}
+         GRANT SELECT ON TABLES TO metabase_reader;
+     {% endfor %}"
 
 quoting:
   database: false
