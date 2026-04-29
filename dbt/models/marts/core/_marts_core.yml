@@ -14,14 +14,18 @@ models:
       - name: product_key
         tests: [unique, not_null]
       - name: product_id
-        tests: [unique, not_null]
+        # NULL allowed for the "(unknown)" sentinel row — line items without
+        # product_id resolve here.
+        tests: [unique]
 
   - name: dim_variants
     columns:
       - name: variant_key
         tests: [unique, not_null]
       - name: variant_id
-        tests: [unique, not_null]
+        # NULL allowed for the "(unknown)" sentinel row — line items without
+        # variant_id resolve here.
+        tests: [unique]
       - name: product_key
         tests:
           - relationships:

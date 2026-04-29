@@ -2,7 +2,9 @@
 
 with sources as (
     select distinct
-        nullif(trim(lower(coalesce(gateway, 'unknown'))), '')          as method_name
+        -- Empty + NULL gateways collapse to 'unknown' so method_name is
+        -- never NULL (referenced as FK from fct_transactions).
+        coalesce(nullif(trim(lower(gateway)), ''), 'unknown')          as method_name
     from {{ ref('stg_haravan__order_transactions') }}
 )
 

@@ -15,7 +15,8 @@ with base as (
         gateway,
         amount_vnd,
         created_at,
-        nullif(trim(lower(coalesce(gateway, 'unknown'))), '') as method_name
+        -- Same coalesce as dim_payment_methods so surrogate keys align.
+        coalesce(nullif(trim(lower(gateway)), ''), 'unknown') as method_name
     from {{ ref('stg_haravan__order_transactions') }}
 )
 
