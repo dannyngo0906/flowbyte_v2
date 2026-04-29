@@ -1,6 +1,16 @@
 version: 2
 
 seeds:
+  - name: dssp_ton_kho_thang4
+    description: "Danh sách sản phẩm tồn kho tháng 4/2026 (539 SKU)."
+    columns:
+      - name: stt
+        tests: [not_null]
+      - name: sku
+        tests: [unique, not_null]
+      - name: ten_san_pham
+        tests: [not_null]
+
   - name: vn_holidays
     description: "VN public holidays 2020–2035; regen via scripts/generate-vn-holidays-seed.py."
     columns:
