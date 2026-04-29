@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: haravan_pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: elt_user
+      POSTGRES_PASSWORD: ${ELT_USER_PASSWORD}
+      POSTGRES_DB: haravan
+      METABASE_APP_PASSWORD: ${METABASE_APP_PASSWORD}
+      METABASE_READER_PASSWORD: ${METABASE_READER_PASSWORD}
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - haravan_pg_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U elt_user -d haravan"]
+      interval: 5s
+      retries: 10
+    networks: [haravan_net]
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: haravan_metabase
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_HOST: postgres
+      MB_DB_PORT: 5432
+      MB_DB_DBNAME: metabase_app
+      MB_DB_USER: metabase_app
+      MB_DB_PASS: ${METABASE_APP_PASSWORD}
+      MB_SITE_URL: ${METABASE_SITE_URL:-http://localhost:3001}
+      MB_SITE_NAME: ${METABASE_SITE_NAME:-Haravan ELT}
+      JAVA_TIMEZONE: Asia/Ho_Chi_Minh
+    volumes:
+      - metabase_data:/metabase-data
+    ports:
+      - "127.0.0.1:3001:3000"
+    networks: [haravan_net]
+
+volumes:
+  haravan_pg_data:
+  metabase_data:
+networks:
+  haravan_net:
+    driver: bridge

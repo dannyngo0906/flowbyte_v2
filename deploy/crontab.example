@@ -7,3 +7,6 @@
 
 # Monthly archive of meta.run_log → meta.run_log_archive (rows >90 days).
 0 3 1 * *   /opt/haravan-elt/scripts/cleanup-run-log.sh   >> /var/log/haravan-elt-cleanup.log 2>&1
+
+# Daily Postgres backups (haravan + metabase_app) at 04:00 local. Retention 7 days.
+0 4 * * *   /opt/haravan-elt/scripts/backup-postgres.sh   >> /var/log/haravan-elt-backup.log  2>&1
