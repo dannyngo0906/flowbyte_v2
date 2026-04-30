@@ -180,9 +180,7 @@ sudo -u elt -i bash -c "
 echo "==> [8/8] Installing systemd timer + cron jobs"
 cp "$APP_DIR/deploy/systemd/haravan-elt.service" /etc/systemd/system/
 cp "$APP_DIR/deploy/systemd/haravan-elt.timer"   /etc/systemd/system/
-# Patch timer to use Asia/Ho_Chi_Minh regardless of host TZ
-sed -i "s|^OnCalendar=.*|OnCalendar=*-*-* 02:00 Asia/Ho_Chi_Minh|" \
-  /etc/systemd/system/haravan-elt.timer
+# Timer template already declares Asia/Ho_Chi_Minh on each OnCalendar — no patch needed.
 
 cp "$APP_DIR/deploy/crontab.example" /etc/cron.d/haravan-elt
 # Adjust paths in cron file (already absolute, no-op) and ensure newline-terminated

@@ -2,8 +2,10 @@
 Description=Haravan ELT daily timer
 
 [Timer]
-# Every day at 02:00 server local time.
-OnCalendar=*-*-* 02:00:00
+# Two runs/day at 02:00 + 14:00 server local time (Asia/Ho_Chi_Minh).
+# Lockfile (/var/lock/haravan-elt.lock) prevents overlap if a run drags long.
+OnCalendar=*-*-* 02:00 Asia/Ho_Chi_Minh
+OnCalendar=*-*-* 14:00 Asia/Ho_Chi_Minh
 # Catch up if the host was off — runs once on next boot.
 Persistent=true
 Unit=haravan-elt.service
