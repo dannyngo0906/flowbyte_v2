@@ -86,8 +86,8 @@ class HaravanClient:
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
     @retry(
-        stop=stop_after_attempt(5),
-        wait=wait_exponential(multiplier=2, min=1, max=30),
+        stop=stop_after_attempt(8),
+        wait=wait_exponential(multiplier=2, min=1, max=60),
         retry=retry_if_exception_type(
             (
                 HaravanRateLimitError,
