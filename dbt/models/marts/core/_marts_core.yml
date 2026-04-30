@@ -29,8 +29,9 @@ models:
       - name: product_key
         tests:
           - relationships:
-              to: ref('dim_products')
-              field: product_key
+              arguments:
+                to: ref('dim_products')
+                field: product_key
 
   - name: dim_locations
     columns:
@@ -63,31 +64,36 @@ models:
       - name: customer_key
         tests:
           - relationships:
-              to: ref('dim_customers')
-              field: customer_key
+              arguments:
+                to: ref('dim_customers')
+                field: customer_key
       - name: location_key
         tests:
           - relationships:
-              to: ref('dim_locations')
-              field: location_key
+              arguments:
+                to: ref('dim_locations')
+                field: location_key
       - name: order_date_key
         tests:
           - relationships:
-              to: ref('dim_date')
-              field: date_key
+              arguments:
+                to: ref('dim_date')
+                field: date_key
       - name: net_revenue_vnd
         tests:
           - dbt_utils.expression_is_true:
               # Tautological vs computed total_refunded_vnd; kept as guard against
               # accidental SQL drift in the int_ model arithmetic.
-              expression: "= total_price_vnd - total_refunded_vnd"
+              arguments:
+                expression: "= total_price_vnd - total_refunded_vnd"
       - name: total_refunded_haravan_vnd
         # Drift signal: warn (not fail) if Haravan's reported total_refunded
         # disagrees with our exploded refunds sum. Tolerance VND 1 to absorb
         # rounding artifacts in stringified numerics.
         tests:
           - dbt_utils.expression_is_true:
-              expression: "is null or abs(coalesce(total_refunded_haravan_vnd, 0) - total_refunded_vnd) < 1"
+              arguments:
+                expression: "is null or abs(coalesce(total_refunded_haravan_vnd, 0) - total_refunded_vnd) < 1"
               config:
                 severity: warn
 
@@ -99,13 +105,15 @@ models:
       - name: variant_key
         tests:
           - relationships:
-              to: ref('dim_variants')
-              field: variant_key
+              arguments:
+                to: ref('dim_variants')
+                field: variant_key
       - name: product_key
         tests:
           - relationships:
-              to: ref('dim_products')
-              field: product_key
+              arguments:
+                to: ref('dim_products')
+                field: product_key
 
   - name: fct_transactions
     columns:
@@ -114,13 +122,15 @@ models:
       - name: order_key
         tests:
           - relationships:
-              to: ref('fct_orders')
-              field: order_key
+              arguments:
+                to: ref('fct_orders')
+                field: order_key
       - name: payment_method_key
         tests:
           - relationships:
-              to: ref('dim_payment_methods')
-              field: payment_method_key
+              arguments:
+                to: ref('dim_payment_methods')
+                field: payment_method_key
 
   - name: fct_refunds
     columns:
@@ -129,8 +139,9 @@ models:
       - name: order_key
         tests:
           - relationships:
-              to: ref('fct_orders')
-              field: order_key
+              arguments:
+                to: ref('fct_orders')
+                field: order_key
 
   - name: fct_inventory_adjustments
     description: "Grain: 1 row per adjustment event. Incremental on adjusted_at."
@@ -142,18 +153,21 @@ models:
       - name: variant_key
         tests:
           - relationships:
-              to: ref('dim_variants')
-              field: variant_key
+              arguments:
+                to: ref('dim_variants')
+                field: variant_key
       - name: location_key
         tests:
           - relationships:
-              to: ref('dim_locations')
-              field: location_key
+              arguments:
+                to: ref('dim_locations')
+                field: location_key
       - name: adjustment_date_key
         tests:
           - relationships:
-              to: ref('dim_date')
-              field: date_key
+              arguments:
+                to: ref('dim_date')
+                field: date_key
 
   - name: fct_inventory_snapshot
     description: "Grain: 1 row per (location, variant, snapshot_date). Daily incremental merge."
@@ -163,21 +177,25 @@ models:
       - name: variant_key
         tests:
           - relationships:
-              to: ref('dim_variants')
-              field: variant_key
+              arguments:
+                to: ref('dim_variants')
+                field: variant_key
       - name: location_key
         tests:
           - relationships:
-              to: ref('dim_locations')
-              field: location_key
+              arguments:
+                to: ref('dim_locations')
+                field: location_key
       - name: snapshot_date_key
         tests:
           - relationships:
-              to: ref('dim_date')
-              field: date_key
+              arguments:
+                to: ref('dim_date')
+                field: date_key
       - name: on_hand_quantity
         tests:
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
+              arguments:
+                expression: ">= 0"
               config:
                 severity: warn

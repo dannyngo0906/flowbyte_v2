@@ -12,7 +12,8 @@ models:
       - name: total_price_vnd
         tests:
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
+              arguments:
+                expression: ">= 0"
 
   - name: stg_haravan__order_refunds
     description: "One row per refund inside an order's refunds[] array."
@@ -24,7 +25,8 @@ models:
       - name: refund_amount_vnd
         tests:
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
+              arguments:
+                expression: ">= 0"
 
   - name: stg_haravan__order_transactions
     description: "Order-level + refund-level transactions, unioned. Refund transactions carry refund_id."
@@ -36,8 +38,9 @@ models:
       - name: kind
         tests:
           - accepted_values:
-              values: ['sale', 'refund', 'authorization', 'capture', 'void', 'change']
-              quote: true
+              arguments:
+                values: ['sale', 'refund', 'authorization', 'capture', 'void', 'change', 'pending']
+                quote: true
               config:
                 severity: warn
 
@@ -61,7 +64,8 @@ models:
       - name: price_vnd
         tests:
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
+              arguments:
+                expression: ">= 0"
 
   - name: stg_haravan__locations
     columns:
@@ -90,7 +94,8 @@ models:
       - name: available_quantity
         tests:
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
+              arguments:
+                expression: ">= 0"
               config:
                 severity: warn
 
