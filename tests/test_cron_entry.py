@@ -44,8 +44,24 @@ def test_main_invokes_app_with_cron_args(monkeypatch: pytest.MonkeyPatch) -> Non
     assert captured == [["run-all", "--triggered-by", "cron"]]
 
 
+def test_main_propagates_returned_exit_code(monkeypatch: pytest.MonkeyPatch) -> None:
+    """standalone_mode=False makes Click RETURN the exit code (not raise).
+
+    Regression: cron_entry used to discard this return value and exit 0, so a
+    failing dbt build was reported as a successful run.
+    """
+
+    def _fake_app(args: list[str], **_: Any) -> int:
+        del args
+        return 1
+
+    monkeypatch.setattr(cron_entry, "acquire_lock", _ok_lock)
+    monkeypatch.setattr(cron_entry, "app", _fake_app)
+    assert cron_entry.main() == 1
+
+
 def test_main_translates_typer_exit_code(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Pipeline failure (typer.Exit(1)) → exit 1, not silent zero."""
+    """Safety net: a click version that re-raises typer.Exit(1) → exit 1."""
 
     def _fake_app(args: list[str], **_: Any) -> None:
         del args

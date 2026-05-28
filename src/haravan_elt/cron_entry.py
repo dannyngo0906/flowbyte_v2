@@ -30,15 +30,21 @@ def main(argv: list[str] | None = None) -> int:
     args = argv if argv is not None else ["run-all", "--triggered-by", "cron"]
     try:
         with acquire_lock(DEFAULT_LOCK_PATH):
+            # With standalone_mode=False, Click RETURNS the typer.Exit code as a
+            # value instead of raising / calling sys.exit. Capturing that return
+            # value is what propagates a dbt/pipeline failure as a non-zero
+            # process exit; before, the discarded return let the service report
+            # success while dbt tests failed. The `except` stays as a safety net
+            # for click versions that re-raise.
             try:
-                app(args, standalone_mode=False)
+                result = app(args, standalone_mode=False)
             except typer.Exit as exc:
                 return int(exc.exit_code or 0)
+            return int(result) if isinstance(result, int) else 0
     except LockBusyError:
         # Another instance holds the lock — exit 2 so the caller can detect.
         print("ERROR: another haravan-elt instance is running", file=sys.stderr)
         return LOCK_BUSY_EXIT_CODE
-    return 0
 
 
 if __name__ == "__main__":  # pragma: no cover
