@@ -26,7 +26,10 @@ select
     net_revenue_vnd
 from {{ ref('int_orders__totals_with_refund_net') }}
 {% if is_incremental() %}
+-- Buffer window to capture late-arriving orders (Haravan API can deliver hours/days late).
+-- Without it, an order whose `order_updated_at` is older than the current fct_orders max
+-- but ingested for the first time today would be silently filtered out.
 where order_updated_at >= (
     select coalesce(max(order_updated_at), '1900-01-01'::timestamptz) from {{ this }}
-)
+) - interval '30 days'
 {% endif %}
