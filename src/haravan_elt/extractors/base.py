@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Mapping
-from datetime import datetime
+from datetime import datetime, timedelta
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
@@ -22,6 +22,13 @@ if TYPE_CHECKING:
     from haravan_elt.client.haravan import HaravanClient
     from haravan_elt.loaders.postgres import PostgresLoader
     from haravan_elt.meta.state import StateManager
+
+# Re-scan window subtracted from the incremental watermark. Haravan list feeds
+# can surface a record AFTER the watermark already advanced past its
+# updated_at (the embedded copy in an order arrives instantly, the standalone
+# list entry lags). Without this buffer such records are skipped forever by the
+# updated_at_min floor. Upserts are idempotent (ON CONFLICT) so re-fetch is safe.
+LATE_ARRIVAL_BUFFER_DAYS = 7
 
 
 class BaseExtractor(ABC):
@@ -80,7 +87,9 @@ class BaseExtractor(ABC):
           but still report max_updated for watermark logging.
         """
         if mode == "incremental" and self.supports_incremental and since is None:
-            since = self.state.get_watermark(self.domain)
+            watermark = self.state.get_watermark(self.domain)
+            if watermark is not None:
+                since = watermark - timedelta(days=LATE_ARRIVAL_BUFFER_DAYS)
 
         rows_total = 0
         max_updated: datetime | None = None
@@ -115,7 +124,7 @@ class PaginatedListExtractor(BaseExtractor):
     # to sibling subclasses sharing the parent's empty default.
     EXTRA_PARAMS: Mapping[str, Any] = MappingProxyType({})
 
-    def __init__(self, *args: Any, page_limit: int = 250, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, page_limit: int = 50, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._limit = page_limit
 
@@ -140,12 +149,12 @@ class PaginatedListExtractor(BaseExtractor):
             if not items:
                 return
             yield items
-            # EOF: short page (research §2 — Haravan has no Link header / total).
-            # Subclasses MUST set page_limit to match the API's actual per-page
-            # cap. Some endpoints (orders, products) cap at 50 server-side
-            # regardless of the requested limit; setting page_limit=250 there
-            # would terminate after page 1 because 50 < 250. See orders.py /
-            # products.py for endpoint-specific overrides.
+            # EOF heuristic: a short page means no more rows (Haravan has no
+            # Link header / total count). This is correct ONLY when page_limit
+            # equals the server's real per-page cap. Haravan caps list endpoints
+            # at 50/page, so the default page_limit is 50; a larger value makes
+            # the first 50-row page look "short" and stops after page 1, silently
+            # dropping everything past row 50 (this bug truncated customers).
             if len(items) < self._limit:
                 return
             page += 1

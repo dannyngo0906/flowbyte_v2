@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from unittest.mock import MagicMock
 from uuid import uuid4
@@ -12,6 +12,7 @@ import respx
 
 from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.config import Settings
+from haravan_elt.extractors.base import LATE_ARRIVAL_BUFFER_DAYS
 from haravan_elt.extractors.orders import ORDERS_PAGE_LIMIT, OrdersExtractor
 
 
@@ -115,11 +116,13 @@ def test_idempotent_load_full_writes_via_loader(fake_settings_env: None) -> None
 def test_incremental_uses_state_watermark(fake_settings_env: None) -> None:  # noqa: ARG001
     del fake_settings_env
     extractor, _, state = _make_extractor(page_limit=50)
-    state.get_watermark.return_value = datetime(2026, 4, 1, tzinfo=UTC)
+    watermark = datetime(2026, 4, 1, tzinfo=UTC)
+    state.get_watermark.return_value = watermark
     route = respx.get("https://apis.haravan.com/com/orders.json").mock(
         return_value=httpx.Response(200, json={"orders": []})
     )
     extractor.idempotent_load("incremental")
     state.get_watermark.assert_called_once_with("orders")
-    sent_url = str(route.calls[0].request.url)
-    assert "updated_at_min=2026-04-01" in sent_url
+    # since floor = watermark - late-arrival buffer (2026-04-01 → 2026-03-25)
+    expected = (watermark - timedelta(days=LATE_ARRIVAL_BUFFER_DAYS)).date().isoformat()
+    assert f"updated_at_min={expected}" in str(route.calls[0].request.url)

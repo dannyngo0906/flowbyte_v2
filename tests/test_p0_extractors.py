@@ -7,7 +7,7 @@ test suite is sufficient.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from unittest.mock import MagicMock
 from uuid import uuid4
@@ -18,7 +18,7 @@ import respx
 
 from haravan_elt.client.haravan import HaravanClient
 from haravan_elt.config import Settings
-from haravan_elt.extractors.base import PaginatedListExtractor
+from haravan_elt.extractors.base import LATE_ARRIVAL_BUFFER_DAYS, PaginatedListExtractor
 from haravan_elt.extractors.customers import CustomersExtractor
 from haravan_elt.extractors.products import PRODUCTS_PAGE_LIMIT, ProductsExtractor
 
@@ -39,6 +39,18 @@ def test_products_default_page_limit_matches_haravan_cap(fake_settings_env: None
     del fake_settings_env
     ext = ProductsExtractor(HaravanClient(Settings()), MagicMock(), MagicMock(), uuid4())
     assert PRODUCTS_PAGE_LIMIT == 50
+    assert ext._limit == 50
+
+
+def test_customers_default_page_limit_matches_haravan_cap(fake_settings_env: None) -> None:
+    """Regression: customers inherits the base default, which MUST be 50.
+
+    A 250 default made the first (server-capped) 50-row page look short and
+    stopped pagination after page 1 — silently dropping every customer past
+    row 50 and orphaning their orders in fct_orders.
+    """
+    del fake_settings_env
+    ext = CustomersExtractor(HaravanClient(Settings()), MagicMock(), MagicMock(), uuid4())
     assert ext._limit == 50
 
 
@@ -108,6 +120,25 @@ def test_idempotent_load_writes_to_correct_table(
     loader.upsert_batch.assert_called_once()
     args, _ = loader.upsert_batch.call_args
     assert args[0] == expected_table
+
+
+@respx.mock
+def test_incremental_watermark_applies_late_arrival_buffer(fake_settings_env: None) -> None:
+    """Incremental `since` floor = watermark - LATE_ARRIVAL_BUFFER_DAYS.
+
+    A record that surfaces in the list feed after the watermark moved past its
+    updated_at must be re-scanned, not skipped forever.
+    """
+    del fake_settings_env
+    extractor, _ = _build(CustomersExtractor, page_limit=50)
+    watermark = datetime(2026, 5, 28, 0, 0, tzinfo=UTC)
+    extractor.state.get_watermark = MagicMock(return_value=watermark)
+    route = respx.get("https://apis.haravan.com/com/customers.json").mock(
+        return_value=httpx.Response(200, json={"customers": []})
+    )
+    extractor.idempotent_load("incremental")
+    expected = (watermark - timedelta(days=LATE_ARRIVAL_BUFFER_DAYS)).isoformat()
+    assert route.calls.last.request.url.params["updated_at_min"] == expected
 
 
 def test_products_preserves_embedded_variants(fake_settings_env: None) -> None:
